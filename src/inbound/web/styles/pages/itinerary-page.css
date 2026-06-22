@@ -1,0 +1,57 @@
+.map-header {
+  padding: 20px 24px;
+  border-radius: 20px;
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.86), rgba(255, 255, 255, 0.72));
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  box-shadow: 0 28px 44px -38px rgba(15, 23, 42, 0.62);
+  backdrop-filter: blur(10px);
+}
+
+.map-header-eyebrow {
+  margin: 0;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: #0b7fc5;
+  font-weight: 700;
+}
+
+.map-header h1 {
+  margin: 8px 0 4px;
+  font-size: clamp(28px, 4.4vw, 46px);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.map-header > p:not(.map-header-eyebrow) {
+  margin: 0;
+  color: #334155;
+}
+
+.map-layout {
+  margin-top: 12px;
+}
+
+.map-stage-stack {
+  position: relative;
+  padding-bottom: 32px;
+}
+
+.map-overlay-card {
+  position: absolute;
+  right: 22px;
+  bottom: 0;
+  width: min(450px, 45%);
+}
+
+@media (max-width: 900px) {
+  .map-stage-stack {
+    padding-bottom: 0;
+  }
+
+  .map-overlay-card {
+    position: static;
+    width: 100%;
+    margin-top: 12px;
+  }
+}

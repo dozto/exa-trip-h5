@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT="${1:-.}"
+cd "$ROOT"
+
+if ! command -v rg >/dev/null 2>&1; then
+  echo "[check-ddd] ripgrep (rg) is required."
+  exit 2
+fi
+
+EXIT_CODE=0
+
+echo "[check-ddd] Running DDD checks..."
+
+# 1) Feature docs must keep minimal required sections
+while IFS= read -r feature_doc; do
+  [ -z "$feature_doc" ] && continue
+  if ! rg -q '^## 最小必填（5 项）' "$feature_doc"; then
+    echo "[FAIL] Missing required section in $feature_doc: ## 最小必填（5 项）"
+    EXIT_CODE=1
+  fi
+  if ! rg -q '^## 验收标准（可测试）' "$feature_doc"; then
+    echo "[FAIL] Missing required section in $feature_doc: ## 验收标准（可测试）"
+    EXIT_CODE=1
+  fi
+  if ! rg -q '^## 边界（本次不做）' "$feature_doc"; then
+    echo "[FAIL] Missing required section in $feature_doc: ## 边界（本次不做）"
+    EXIT_CODE=1
+  fi
+done < <(rg --files .ai/features | rg -v '_template\.md$' || true)
+
+if [ "$EXIT_CODE" -eq 0 ]; then
+  echo "[check-ddd] PASS"
+else
+  echo "[check-ddd] FAIL"
+fi
+
+exit "$EXIT_CODE"

@@ -1,0 +1,151 @@
+{
+  "schemaVersion": "1.0.0",
+  "tripId": "trip-jp-kansai-2026-spring",
+  "title": "关西 3 日轻旅行",
+  "timezone": "Asia/Tokyo",
+  "startDate": "2026-04-10",
+  "endDate": "2026-04-12",
+  "days": [
+    {
+      "dayId": "day-1",
+      "date": "2026-04-10",
+      "dayIndex": 1,
+      "city": "Osaka",
+      "summary": "到达与城市漫步",
+      "items": [
+        {
+          "itemId": "item-1-1",
+          "title": "酒店办理入住",
+          "content": "到达酒店后寄存行李并确认次日早餐时间。",
+          "placeId": "place-hotel",
+          "startTime": "14:00",
+          "endTime": "14:40",
+          "durationMinutes": 40,
+          "category": "hotel"
+        },
+        {
+          "itemId": "item-1-2",
+          "title": "道顿堀夜间漫步",
+          "content": "体验夜景与街头美食，控制步行节奏。",
+          "placeId": "place-dotonbori",
+          "startTime": "18:30",
+          "endTime": "20:30",
+          "durationMinutes": 120,
+          "category": "sightseeing"
+        }
+      ],
+      "preparations": [
+        {
+          "id": "prep-1",
+          "title": "便携雨具",
+          "level": "should",
+          "note": "春季可能短时降雨。"
+        }
+      ]
+    },
+    {
+      "dayId": "day-2",
+      "date": "2026-04-11",
+      "dayIndex": 2,
+      "city": "Kyoto",
+      "summary": "寺社与古街体验",
+      "items": [
+        {
+          "itemId": "item-2-1",
+          "title": "伏见稻荷参观",
+          "content": "清晨参观，避开高峰时段。",
+          "placeId": "place-fushimi-inari",
+          "startTime": "08:00",
+          "endTime": "10:00",
+          "durationMinutes": 120,
+          "category": "sightseeing"
+        },
+        {
+          "itemId": "item-2-2",
+          "title": "祇园步行",
+          "content": "午后散步并进行拍照打卡。",
+          "placeId": "place-gion",
+          "startTime": "14:00",
+          "endTime": "15:30",
+          "durationMinutes": 90,
+          "category": "free"
+        }
+      ],
+      "suggestions": [
+        {
+          "id": "sug-2",
+          "type": "timing",
+          "content": "热门景点优先安排在上午。",
+          "priority": "medium"
+        }
+      ]
+    },
+    {
+      "dayId": "day-3",
+      "date": "2026-04-12",
+      "dayIndex": 3,
+      "city": "Osaka",
+      "summary": "返程准备",
+      "items": [
+        {
+          "itemId": "item-3-1",
+          "title": "退房与前往机场",
+          "content": "确认护照与证件，预留交通缓冲时间。",
+          "placeId": "place-kix",
+          "startTime": "10:30",
+          "endTime": "12:00",
+          "durationMinutes": 90,
+          "category": "transport"
+        }
+      ]
+    }
+  ],
+  "places": {
+    "place-hotel": {
+      "placeId": "place-hotel",
+      "name": "难波站附近酒店",
+      "address": "Namba, Osaka",
+      "highlights": ["交通便利", "可步行到餐饮区"]
+    },
+    "place-dotonbori": {
+      "placeId": "place-dotonbori",
+      "name": "道顿堀",
+      "address": "Chuo Ward, Osaka",
+      "highlights": ["夜景", "街头美食"]
+    },
+    "place-fushimi-inari": {
+      "placeId": "place-fushimi-inari",
+      "name": "伏见稻荷大社",
+      "address": "Fushimi Ward, Kyoto",
+      "highlights": ["千本鸟居"]
+    },
+    "place-gion": {
+      "placeId": "place-gion",
+      "name": "祇园",
+      "address": "Higashiyama Ward, Kyoto",
+      "highlights": ["古街氛围"]
+    },
+    "place-kix": {
+      "placeId": "place-kix",
+      "name": "关西国际机场",
+      "address": "Kansai Airport, Osaka",
+      "highlights": ["国际航线", "交通换乘"]
+    }
+  },
+  "globalPreparations": [
+    {
+      "id": "prep-global-1",
+      "title": "轻便鞋",
+      "level": "must",
+      "note": "连续步行场景较多。"
+    }
+  ],
+  "globalSuggestions": [
+    {
+      "id": "sug-global-1",
+      "type": "budget",
+      "content": "餐饮和交通预算按日预留 10% 弹性。",
+      "priority": "medium"
+    }
+  ]
+}

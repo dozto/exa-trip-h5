@@ -1,0 +1,34 @@
+# 认知层入口（.ai/index.md）
+
+> AI 开工先读本文件。本目录是**认知层**（AI 主笔、人确认）：记录"系统是什么、怎么做"的压缩理解。
+
+## 本目录用途
+
+| 路径 | 作用 |
+|------|------|
+| `index.md`（本文件） | 系统地图：领域与特性清单 |
+| `current.md` | 当前状态：焦点、现状快照、已知约束 / 债务 |
+| `agent.md` | AI 工作规则与门控流程 |
+| `workflow-feature-delivery.md` | Feature 交付流程（提问、拆分、RFC、实现、回写） |
+| `domains/` | 各领域的压缩认知（每域一文件） |
+| `features/` | 各特性的认知（每特性一文件） |
+| `rfcs/` | 变更过程与提案（RFC，编号永存） |
+
+## 关键约束入口（来自 `.human/`）
+
+- [`.human/architecture.md`](../.human/architecture.md) — 总体架构约束与依赖方向
+- [`.human/ddd-principles.md`](../.human/ddd-principles.md) — DDD 专项约束（统一语言、聚合、无领域事件策略、测试）
+- [`.human/hexagonal-principles.md`](../.human/hexagonal-principles.md) — 六边形专项约束（ports、inbound/outbound、组装根、边界转换）
+
+## 对话触发入口
+
+- 推荐：`/feature <name> [mode=fast|strict]`
+- 规则见 [`.ai/agent.md`](./agent.md) 与 [`.ai/workflow-feature-delivery.md`](./workflow-feature-delivery.md)
+
+## 领域（Domains）
+
+- [trip-planning](domains/trip-planning.md) — 行程计划与按日活动编排（天、地点、建议、准备事项）。
+
+## 特性（Features）
+
+- [view-itinerary](features/view-itinerary.md) — 加载行程、切换日期、地图点位联动展示当日详情。

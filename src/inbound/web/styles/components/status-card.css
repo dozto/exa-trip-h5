@@ -1,0 +1,10 @@
+.status-card {
+  margin-top: 14px;
+  margin-bottom: 14px;
+}
+
+.status-card p {
+  margin: 0;
+  color: #9a3412;
+  font-weight: 600;
+}

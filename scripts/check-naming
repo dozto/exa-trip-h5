@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT="${1:-.}"
+cd "$ROOT"
+
+if ! command -v rg >/dev/null 2>&1; then
+  echo "[check-naming] ripgrep (rg) is required."
+  exit 2
+fi
+
+EXIT_CODE=0
+
+check_suffix() {
+  local folder="$1"
+  local expected_suffix="$2"
+  local label="$3"
+
+  local files
+  files="$(rg --files "src/outbound/${folder}" 2>/dev/null || true)"
+
+  if [ -z "$files" ]; then
+    return
+  fi
+
+  while IFS= read -r file; do
+    [ -z "$file" ] && continue
+    if [[ ! "$file" =~ ${expected_suffix}$ ]]; then
+      echo "[FAIL] ${label} file must end with ${expected_suffix}: ${file}"
+      EXIT_CODE=1
+    fi
+  done <<<"$files"
+}
+
+echo "[check-naming] Running outbound naming checks..."
+
+check_suffix "repositories" "\\.repository\\.ts" "repository"
+check_suffix "validators" "\\.validator\\.ts" "validator"
+check_suffix "gateways" "\\.gateway\\.ts" "gateway"
+check_suffix "mappers" "\\.mapper\\.ts" "mapper"
+
+if [ "$EXIT_CODE" -eq 0 ]; then
+  echo "[check-naming] PASS"
+else
+  echo "[check-naming] FAIL"
+fi
+
+exit "$EXIT_CODE"

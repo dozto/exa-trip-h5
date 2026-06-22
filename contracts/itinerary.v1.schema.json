@@ -1,0 +1,279 @@
+{
+  "$ref": "#/definitions/TripPlan",
+  "definitions": {
+    "TripPlan": {
+      "type": "object",
+      "properties": {
+        "schemaVersion": {
+          "type": "string",
+          "const": "1.0.0"
+        },
+        "tripId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "timezone": {
+          "type": "string",
+          "minLength": 1
+        },
+        "startDate": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+        },
+        "endDate": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+        },
+        "days": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "dayId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "date": {
+                "type": "string",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+              },
+              "dayIndex": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "city": {
+                "type": "string"
+              },
+              "summary": {
+                "type": "string"
+              },
+              "items": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "itemId": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "title": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "content": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "placeId": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "startTime": {
+                      "type": "string",
+                      "pattern": "^\\d{2}:\\d{2}$"
+                    },
+                    "endTime": {
+                      "type": "string",
+                      "pattern": "^\\d{2}:\\d{2}$"
+                    },
+                    "durationMinutes": {
+                      "type": "integer",
+                      "minimum": 1
+                    },
+                    "category": {
+                      "type": "string",
+                      "enum": [
+                        "transport",
+                        "sightseeing",
+                        "food",
+                        "hotel",
+                        "free"
+                      ]
+                    },
+                    "preparations": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "title": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "level": {
+                            "type": "string",
+                            "enum": [
+                              "must",
+                              "should",
+                              "optional"
+                            ]
+                          },
+                          "note": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "title",
+                          "level"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "suggestions": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "type": {
+                            "type": "string",
+                            "enum": [
+                              "timing",
+                              "route",
+                              "safety",
+                              "packing",
+                              "food",
+                              "budget"
+                            ]
+                          },
+                          "content": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "priority": {
+                            "type": "string",
+                            "enum": [
+                              "high",
+                              "medium",
+                              "low"
+                            ]
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "type",
+                          "content",
+                          "priority"
+                        ],
+                        "additionalProperties": false
+                      }
+                    }
+                  },
+                  "required": [
+                    "itemId",
+                    "title",
+                    "content",
+                    "durationMinutes"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "preparations": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/definitions/TripPlan/properties/days/items/properties/items/items/properties/preparations/items"
+                }
+              },
+              "suggestions": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/definitions/TripPlan/properties/days/items/properties/items/items/properties/suggestions/items"
+                }
+              }
+            },
+            "required": [
+              "dayId",
+              "date",
+              "dayIndex",
+              "items"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 1
+        },
+        "places": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "placeId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1
+              },
+              "address": {
+                "type": "string"
+              },
+              "lat": {
+                "type": "number",
+                "minimum": -90,
+                "maximum": 90
+              },
+              "lng": {
+                "type": "number",
+                "minimum": -180,
+                "maximum": 180
+              },
+              "highlights": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "tips": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "placeId",
+              "name"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "globalPreparations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/TripPlan/properties/days/items/properties/items/items/properties/preparations/items"
+          }
+        },
+        "globalSuggestions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/TripPlan/properties/days/items/properties/items/items/properties/suggestions/items"
+          }
+        }
+      },
+      "required": [
+        "schemaVersion",
+        "tripId",
+        "title",
+        "timezone",
+        "startDate",
+        "endDate",
+        "days",
+        "places"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://exa-trip-h5.local/contracts/itinerary.v1.schema.json"
+}

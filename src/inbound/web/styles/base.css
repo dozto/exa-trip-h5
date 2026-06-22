@@ -1,0 +1,30 @@
+:root {
+  font-family: "Noto Sans SC", "PingFang SC", sans-serif;
+  color: #0f172a;
+  background:
+    radial-gradient(circle at 10% 10%, #dbeafe 0%, rgba(219, 234, 254, 0) 44%),
+    radial-gradient(circle at 86% 16%, #d1fae5 0%, rgba(209, 250, 229, 0) 42%),
+    #f8fafc;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  color: #0f172a;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: geometricPrecision;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+.page-shell {
+  max-width: 1220px;
+  margin: 0 auto;
+  padding: 22px 18px 48px;
+}

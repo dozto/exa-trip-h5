@@ -1,0 +1,40 @@
+{
+  "name": "exa-trip-h5",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -p tsconfig.json && vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "generate:contracts": "bun run scripts/generate-contracts.ts",
+    "check:architecture": "./scripts/check-architecture",
+    "check:ddd": "./scripts/check-ddd",
+    "check:doc-sync": "./scripts/check-doc-sync",
+    "check:naming": "./scripts/check-naming"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.3.1",
+    "@types/node": "^24.0.8",
+    "@types/react": "^18.3.18",
+    "@types/react-dom": "^18.3.5",
+    "@vitejs/plugin-react": "^4.3.4",
+    "tailwindcss": "^4.3.1",
+    "typescript": "^5.8.3",
+    "vite": "^5.4.12",
+    "vitest": "^3.2.4"
+  },
+  "dependencies": {
+    "@heroui/react": "^2.6.14",
+    "@tanstack/react-router": "^1.131.2",
+    "eventemitter3": "^5.0.1",
+    "framer-motion": "^11.15.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "zustand": "^5.0.8",
+    "zod": "^3.24.1",
+    "zod-to-json-schema": "^3.24.6"
+  }
+}

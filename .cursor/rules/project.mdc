@@ -1,0 +1,8 @@
+---
+description: 项目 AI 规则入口，指向单一规则源
+alwaysApply: true
+---
+
+本仓库唯一 AI 规则源是 [.ai/agent.md](../../.ai/agent.md)。
+开工入口见 [AGENTS.md](../../AGENTS.md)。
+技能目录在 [.skills/](../../.skills/)（每个技能一个目录，入口 `SKILL.md`）。

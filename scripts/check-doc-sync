@@ -1,0 +1,86 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT="${1:-.}"
+MODE="${2:-all}" # all | staged
+cd "$ROOT"
+
+if ! command -v git >/dev/null 2>&1; then
+  echo "[check-doc-sync] git is required."
+  exit 2
+fi
+
+if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+  echo "[check-doc-sync] must run inside a git repository."
+  exit 2
+fi
+
+collect_changes() {
+  if [ "$MODE" = "staged" ]; then
+    git diff --name-only --cached
+  else
+    {
+      git diff --name-only
+      git diff --name-only --cached
+      git ls-files --others --exclude-standard
+    } | sort -u
+  fi
+}
+
+CHANGED="$(collect_changes)"
+
+if [ -z "$CHANGED" ]; then
+  echo "[check-doc-sync] PASS (no changes)"
+  exit 0
+fi
+
+EXIT_CODE=0
+
+has_path_prefix() {
+  local prefix="$1"
+  printf '%s\n' "$CHANGED" | rg -q "^${prefix}"
+}
+
+has_rfc_change() {
+  printf '%s\n' "$CHANGED" | rg -q '^\.ai/rfcs/RFC-[0-9]{4}.*\.md$'
+}
+
+has_tiny_change_record() {
+  printf '%s\n' "$CHANGED" | rg -q '^\.ai/rfcs/tiny-change(-[a-z0-9-]+)?\.md$'
+}
+
+has_current_change() {
+  printf '%s\n' "$CHANGED" | rg -q '^\.ai/current\.md$'
+}
+
+if has_path_prefix 'src/' || has_path_prefix 'tests/'; then
+  if ! has_rfc_change && ! has_tiny_change_record; then
+    echo "[FAIL] src/tests changed but no RFC update or tiny-change record found in .ai/rfcs/."
+    EXIT_CODE=1
+  fi
+  if ! has_current_change; then
+    echo "[FAIL] src/tests changed but .ai/current.md not updated."
+    EXIT_CODE=1
+  fi
+fi
+
+if has_rfc_change; then
+  RFC_FILES="$(printf '%s\n' "$CHANGED" | rg '^\.ai/rfcs/RFC-[0-9]{4}.*\.md$' || true)"
+  if [ -n "$RFC_FILES" ]; then
+    while IFS= read -r rfc_file; do
+      [ -z "$rfc_file" ] && continue
+      if ! rg -q '^- 状态：' "$rfc_file"; then
+        echo "[FAIL] RFC missing status field: $rfc_file"
+        EXIT_CODE=1
+      fi
+    done <<<"$RFC_FILES"
+  fi
+fi
+
+if [ "$EXIT_CODE" -eq 0 ]; then
+  echo "[check-doc-sync] PASS"
+else
+  echo "[check-doc-sync] FAIL"
+fi
+
+exit "$EXIT_CODE"

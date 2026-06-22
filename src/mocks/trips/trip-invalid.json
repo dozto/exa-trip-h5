@@ -1,0 +1,24 @@
+{
+  "schemaVersion": "1.0.0",
+  "tripId": "trip-invalid",
+  "title": "非法数据演示",
+  "timezone": "Asia/Shanghai",
+  "startDate": "2026-05-03",
+  "endDate": "2026-05-03",
+  "days": [
+    {
+      "dayId": "day-1",
+      "date": "2026-05-03",
+      "dayIndex": 1,
+      "items": [
+        {
+          "itemId": "item-invalid-1",
+          "title": "非法时长数据",
+          "content": "durationMinutes = 0 将触发 Zod 校验错误",
+          "durationMinutes": 0
+        }
+      ]
+    }
+  ],
+  "places": {}
+}

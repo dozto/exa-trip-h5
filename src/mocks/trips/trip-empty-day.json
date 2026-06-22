@@ -1,0 +1,21 @@
+{
+  "schemaVersion": "1.0.0",
+  "tripId": "trip-empty-day",
+  "title": "空场景演示行程",
+  "timezone": "Asia/Shanghai",
+  "startDate": "2026-05-01",
+  "endDate": "2026-05-01",
+  "days": [
+    {
+      "dayId": "day-1",
+      "date": "2026-05-01",
+      "dayIndex": 1,
+      "city": "Shanghai",
+      "summary": "仅用于空态测试",
+      "items": []
+    }
+  ],
+  "places": {},
+  "globalPreparations": [],
+  "globalSuggestions": []
+}

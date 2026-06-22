@@ -1,0 +1,73 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT="${1:-.}"
+cd "$ROOT"
+
+if ! command -v rg >/dev/null 2>&1; then
+  echo "[check-architecture] ripgrep (rg) is required."
+  exit 2
+fi
+
+EXIT_CODE=0
+
+print_violation() {
+  local title="$1"
+  local pattern="$2"
+  local scope="$3"
+
+  local out
+  out="$(rg -n --no-heading --glob "$scope" -e "$pattern" src || true)"
+  if [ -n "$out" ]; then
+    echo "[FAIL] $title"
+    echo "$out"
+    echo
+    EXIT_CODE=1
+  fi
+}
+
+echo "[check-architecture] Running architecture boundary checks..."
+
+# domains must not depend on outer layers
+print_violation \
+  "ARCH-R1 src/domains must not import features/inbound/outbound/bootstrap" \
+  '(from|import|require\().*(features|inbound|outbound|bootstrap)' \
+  'domains/**/*.*'
+
+# features must not import implementation layers directly
+print_violation \
+  "ARCH-R2 src/features must not import inbound/outbound/bootstrap" \
+  '(from|import|require\().*(inbound/|outbound/|bootstrap/)' \
+  'features/**/*.*'
+
+# inbound adapters must not import outbound adapters
+print_violation \
+  "ARCH-R3 src/inbound must not import src/outbound" \
+  '(from|import|require\().*(outbound/)' \
+  'inbound/**/*.*'
+
+# outbound adapters must not import inbound adapters
+print_violation \
+  "ARCH-R4 src/outbound must not import src/inbound" \
+  '(from|import|require\().*(inbound/)' \
+  'outbound/**/*.*'
+
+# bootstrap should avoid business-rule style declarations (heuristic)
+print_violation \
+  "ARCH-R5 src/bootstrap should not contain domain rule declarations (heuristic)" \
+  '(aggregate|invariant|domain service|business rule)' \
+  'bootstrap/**/*.*'
+
+# features must be function-based use cases (no class-based use case implementation)
+print_violation \
+  "ARCH-R6 src/features must not use class-based use cases" \
+  'class\s+[A-Za-z0-9_]*UseCase\b' \
+  'features/**/*.*'
+
+if [ "$EXIT_CODE" -eq 0 ]; then
+  echo "[check-architecture] PASS"
+else
+  echo "[check-architecture] FAIL"
+fi
+
+exit "$EXIT_CODE"
