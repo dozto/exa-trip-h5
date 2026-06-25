@@ -100,3 +100,11 @@
 
 - 当前生效口径以 `/.human/architecture.md`、`/.human/splitting-rules.md`、`/.ai/workflow-feature-delivery.md` 为准。
 - `inbound/outbound/bootstrap -> features -> domains` 为唯一依赖方向口径。
+
+## 8) 现状补充（2026-06-25）
+
+- `src/features` 在“平铺”基础上已形成“聚合特性 + 子用例特性”组合：
+  - 聚合特性：`view-itinerary`
+  - 子用例特性：`load-trip-plan`、`switch-current-day`、`plan-trip-routes`、`show-day-decision-hints`
+- 聚合编排入口位于 `src/inbound/web/state/command/handlers.ts`，负责串联子用例并消费结果。
+- 该补充不改变 RFC-0001 的主决策，仅更新已落地协作形态。

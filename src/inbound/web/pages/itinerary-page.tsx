@@ -10,38 +10,56 @@ export const ItineraryPage = () => {
   const pageModel = useItineraryPageModel();
 
   return (
-    <div className="page-shell">
-      <header className="map-header">
-        <p className="map-header-eyebrow">Trip View</p>
-        <h1>{pageModel.headerModel.title}</h1>
-        <p>{pageModel.headerModel.subtitle}</p>
-      </header>
+    <div className="itinerary-stage">
+      <div className="map-background-layer">
+        <MapCanvas
+          model={pageModel.mapModel}
+          isLoading={pageModel.isLoading}
+          onSelectPoint={pageModel.onSelectMapPoint}
+          onSelectTravelMode={pageModel.onSelectTravelMode}
+          onSelectHintActivity={pageModel.onSelectHintActivity}
+          reduceMotion={Boolean(prefersReducedMotion)}
+        />
+      </div>
 
-      <ItineraryDateStrip
-        model={pageModel.dateStripModel}
-        isLoading={pageModel.isLoading}
-        onSwitchDay={pageModel.onSwitchDay}
-      />
+      <div className="itinerary-overlay itinerary-overlay-top">
+        <header className="map-header">
+          <p className="map-header-eyebrow">Trip View</p>
+          <h1>{pageModel.headerModel.title}</h1>
+          <p>{pageModel.headerModel.subtitle}</p>
+        </header>
+      </div>
 
-      <ErrorMessageCard message={pageModel.errorMessage} />
+      <div className="itinerary-overlay itinerary-overlay-status">
+        <ErrorMessageCard message={pageModel.errorMessage} />
+        <ErrorMessageCard
+          message={pageModel.navigationPlanWarning}
+          title="路线提示"
+          tone="warning"
+        />
+        <ErrorMessageCard
+          message={pageModel.decisionHintsWarning}
+          title="预估提示"
+          tone="warning"
+        />
+      </div>
 
-      <section className="map-layout">
-        <div className="map-stage-stack">
-          <MapCanvas
-            model={pageModel.mapModel}
-            isLoading={pageModel.isLoading}
-            onSelectPoint={pageModel.onSelectMapPoint}
-            reduceMotion={Boolean(prefersReducedMotion)}
-          />
+      <div className="itinerary-overlay itinerary-overlay-right">
+        <ItineraryLocationCard
+          model={pageModel.currentCardModel}
+          focusedItemId={pageModel.focusedActivityId}
+          onFocusedItemSettled={pageModel.onClearFocusedActivity}
+          reduceMotion={Boolean(prefersReducedMotion)}
+        />
+      </div>
 
-          <div className="map-overlay-card">
-            <ItineraryLocationCard
-              model={pageModel.currentCardModel}
-              reduceMotion={Boolean(prefersReducedMotion)}
-            />
-          </div>
-        </div>
-      </section>
+      <div className="itinerary-overlay itinerary-overlay-bottom">
+        <ItineraryDateStrip
+          model={pageModel.dateStripModel}
+          isLoading={pageModel.isLoading}
+          onSwitchDay={pageModel.onSwitchDay}
+        />
+      </div>
     </div>
   );
 };

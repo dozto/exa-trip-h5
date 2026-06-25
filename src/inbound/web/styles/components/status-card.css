@@ -3,8 +3,24 @@
   margin-bottom: 14px;
 }
 
+.status-card-title {
+  margin: 0 0 6px;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #92400e;
+}
+
 .status-card p {
   margin: 0;
   color: #9a3412;
   font-weight: 600;
+}
+
+.status-card-warning .status-card-title {
+  color: #854d0e;
+}
+
+.status-card-warning p {
+  color: #854d0e;
 }

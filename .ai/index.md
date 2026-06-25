@@ -28,7 +28,12 @@
 ## 领域（Domains）
 
 - [trip-planning](domains/trip-planning.md) — 行程计划与按日活动编排（天、地点、建议、准备事项）。
+- [trip-navigation](domains/trip-navigation.md) — 基于地点序列的路线预估与事件预估语义（分段、策略、风险、可行性）。
 
 ## 特性（Features）
 
-- [view-itinerary](features/view-itinerary.md) — 加载行程、切换日期、地图点位联动展示当日详情。
+- [view-itinerary](features/view-itinerary.md) — 页面聚合特性，编排加载、切天、路线预估与决策提示的结果消费。
+- [load-trip-plan](features/load-trip-plan.md) — 读取并校验 TripPlan，返回默认当前日。
+- [switch-current-day](features/switch-current-day.md) — 切换当前展示 dayId 的稳定语义。
+- [plan-trip-routes](features/plan-trip-routes.md) — 计算当日地点间路线，返回 walk/transit/drive 候选与推荐。
+- [show-day-decision-hints](features/show-day-decision-hints.md) — 基于路线与活动时间窗生成出发建议、风险与衔接可行性。

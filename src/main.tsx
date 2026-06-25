@@ -3,6 +3,7 @@ import { createRoot } from "react-dom/client";
 import { bootstrapWebApp } from "./bootstrap/web";
 import { TripModelRuntimeContext } from "./inbound/web/state/store/runtime-context";
 import { AppRouter } from "./inbound/web/routes/router";
+import "mapbox-gl/dist/mapbox-gl.css";
 import "./inbound/web/styles/index.css";
 
 const rootElement = document.getElementById("root");

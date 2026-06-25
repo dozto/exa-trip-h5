@@ -5,6 +5,8 @@ export type MapPointSelectorResult = {
   dayId: string;
   label: string;
   address: string;
+  lat: number | null;
+  lng: number | null;
   x: number;
   y: number;
   isActive: boolean;
@@ -102,6 +104,8 @@ export const selectMapPoints = (
         dayId: day.dayId,
         label: place.name,
         address: place.address ?? "",
+        lat: typeof place.lat === "number" ? place.lat : null,
+        lng: typeof place.lng === "number" ? place.lng : null,
         x: coordinates.x,
         y: coordinates.y,
         isActive: day.dayId === activeDayId

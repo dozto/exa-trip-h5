@@ -70,7 +70,7 @@ src/
   shared/
 ```
 
-### B. inbound 细分（当前 web）
+### B. inbound 细分（web 实现示例）
 
 ```text
 src/inbound/
@@ -86,7 +86,7 @@ src/inbound/
     styles/
 ```
 
-### C. outbound 细分（当前）
+### C. outbound 细分
 
 ```text
 src/outbound/
@@ -130,12 +130,6 @@ src/outbound/
 **① 通过测试 -> ② 意图清晰 -> ③ 无重复 -> ④ 元素最少**。
 
 结构按真实复杂度增长（单文件 -> 文件夹 -> 限界上下文），由校验规则持续守边界。
-
-## 限界上下文（Bounded Contexts）
-
-| 上下文 | 职责 | 关键聚合 | 关系 |
-|--------|------|----------|------|
-| `trip-planning` | 行程查看与按日编排语义 | `TripPlan`, `TripDay`, `ItineraryItem`, `Place` | 当前单上下文 |
 
 ## 例外与偏离
 

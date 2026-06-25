@@ -1,10 +1,28 @@
+.date-strip-shell {
+  --date-gap: 10px;
+  --pill-size: clamp(148px, 18vw, 216px);
+  --visible-count: 5;
+  position: relative;
+  width: min(
+    100%,
+    calc(var(--visible-count) * var(--pill-size) + (var(--visible-count) - 1) * var(--date-gap) + 16px)
+  );
+  padding: 8px;
+  border-radius: 20px;
+  background: linear-gradient(170deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.7));
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  box-shadow: 0 24px 36px -32px rgba(15, 23, 42, 0.9);
+  backdrop-filter: blur(10px);
+}
+
 .date-strip {
-  margin-top: 16px;
   display: flex;
-  gap: 10px;
+  gap: var(--date-gap);
   overflow-x: auto;
-  padding: 2px 0 8px;
+  padding: 2px 4px 4px;
   scrollbar-width: thin;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
 }
 
 .date-strip::-webkit-scrollbar {
@@ -12,7 +30,8 @@
 }
 
 .date-pill {
-  min-width: 160px;
+  min-width: var(--pill-size);
+  flex: 0 0 auto;
   height: auto;
   padding: 9px 13px;
   border-radius: 16px;
@@ -22,6 +41,7 @@
   background: rgba(255, 255, 255, 0.82);
   box-shadow: 0 12px 24px -24px rgba(15, 23, 42, 0.75);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  scroll-snap-align: center;
 }
 
 .date-pill:hover {
@@ -50,4 +70,73 @@
 
 .date-pill-city {
   margin-top: 4px;
+}
+
+.date-strip-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 10px 18px -14px rgba(15, 23, 42, 0.9);
+}
+
+.date-strip-arrow.is-left {
+  left: 10px;
+}
+
+.date-strip-arrow.is-right {
+  right: 10px;
+}
+
+.date-strip-arrow-icon {
+  width: 16px;
+  height: 16px;
+  display: inline-flex;
+  color: #334155;
+}
+
+.date-strip-arrow-icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.date-strip-shell.has-controls .date-strip {
+  padding-left: 42px;
+  padding-right: 42px;
+}
+
+@media (max-width: 900px) {
+  .date-strip-shell {
+    --date-gap: 8px;
+    --pill-size: clamp(136px, 42vw, 180px);
+    border-radius: 16px;
+    padding: 6px;
+  }
+
+  .date-strip {
+    gap: 8px;
+  }
+
+  .date-pill {
+    padding: 8px 12px;
+  }
+
+  .date-pill-date {
+    font-size: 14px;
+  }
+
+  .date-strip-shell.has-controls .date-strip {
+    padding-left: 36px;
+    padding-right: 36px;
+  }
+
+  .date-strip-arrow.is-left {
+    left: 6px;
+  }
+
+  .date-strip-arrow.is-right {
+    right: 6px;
+  }
 }

@@ -37,6 +37,28 @@ const flush = async () => {
 
 const initialStoreState = useTripViewStore.getState();
 
+const exampleNavigationPlan = {
+  dayId: "day-1",
+  legs: [],
+  updatedAt: "2026-03-01T00:00:00.000Z",
+  isFallback: false
+};
+
+const exampleDecisionHints = {
+  dayId: "day-1",
+  eventEstimates: [
+    {
+      activityId: "item-1",
+      suggestedBufferMinutes: 15,
+      latenessRiskLevel: "low" as const,
+      overrunRiskLevel: "low" as const,
+      travelMinutes: 0
+    }
+  ],
+  feasibilityAssessments: [],
+  updatedAt: "2026-03-01T00:00:00.000Z"
+};
+
 describe("registerTripModelHandlers", () => {
   beforeEach(() => {
     useTripViewStore.setState(initialStoreState, true);
@@ -56,11 +78,21 @@ describe("registerTripModelHandlers", () => {
       }
     }));
     const switchCurrentDay = vi.fn();
+    const planTripRoutes = vi.fn(async () => ({
+      ok: true as const,
+      value: exampleNavigationPlan
+    }));
+    const showDayDecisionHints = vi.fn(async () => ({
+      ok: true as const,
+      value: exampleDecisionHints
+    }));
 
     const stop = registerTripModelHandlers({
       commandBus,
       loadTripPlan,
-      switchCurrentDay
+      switchCurrentDay,
+      planTripRoutes,
+      showDayDecisionHints
     });
 
     commandBus.emit(tripCommands.pageOpened("trip-jp-kansai-2026-spring"));
@@ -72,6 +104,17 @@ describe("registerTripModelHandlers", () => {
     expect(state.currentDayId).toBe("day-1");
     expect(state.isLoading).toBe(false);
     expect(state.errorMessage).toBeNull();
+    expect(planTripRoutes).toHaveBeenCalledWith({
+      tripPlan: exampleTripPlan,
+      dayId: "day-1",
+      modes: ["drive"]
+    });
+    expect(showDayDecisionHints).toHaveBeenCalledWith({
+      tripPlan: exampleTripPlan,
+      dayId: "day-1",
+      navigationPlan: exampleNavigationPlan,
+      defaultBufferMinutes: 15
+    });
 
     stop();
   });
@@ -86,11 +129,15 @@ describe("registerTripModelHandlers", () => {
       }
     }));
     const switchCurrentDay = vi.fn();
+    const planTripRoutes = vi.fn();
+    const showDayDecisionHints = vi.fn();
 
     const stop = registerTripModelHandlers({
       commandBus,
       loadTripPlan,
-      switchCurrentDay
+      switchCurrentDay,
+      planTripRoutes,
+      showDayDecisionHints
     });
 
     commandBus.emit(tripCommands.pageOpened("trip-jp-kansai-2026-spring"));
@@ -120,11 +167,15 @@ describe("registerTripModelHandlers", () => {
         message: "switch failed"
       }
     }));
+    const planTripRoutes = vi.fn();
+    const showDayDecisionHints = vi.fn();
 
     const stop = registerTripModelHandlers({
       commandBus,
       loadTripPlan,
-      switchCurrentDay
+      switchCurrentDay,
+      planTripRoutes,
+      showDayDecisionHints
     });
 
     commandBus.emit(tripCommands.daySelected("day-2"));
@@ -134,6 +185,56 @@ describe("registerTripModelHandlers", () => {
     expect(switchCurrentDay).toHaveBeenNthCalledWith(1, { dayId: "day-2" });
     expect(switchCurrentDay).toHaveBeenNthCalledWith(2, { dayId: "day-3" });
     expect(useTripViewStore.getState().errorMessage).toBe("switch failed");
+
+    stop();
+  });
+
+  it("refreshes route plan when travel mode changes", async () => {
+    const commandBus = createTripUiCommandBus();
+    const loadTripPlan = vi.fn();
+    const switchCurrentDay = vi.fn();
+    const planTripRoutes = vi.fn(async () => ({
+      ok: true as const,
+      value: exampleNavigationPlan
+    }));
+    const showDayDecisionHints = vi.fn(async () => ({
+      ok: true as const,
+      value: exampleDecisionHints
+    }));
+
+    useTripViewStore.setState(
+      {
+        ...useTripViewStore.getState(),
+        tripPlan: exampleTripPlan,
+        currentDayId: "day-1",
+        selectedTravelMode: "drive"
+      },
+      true
+    );
+
+    const stop = registerTripModelHandlers({
+      commandBus,
+      loadTripPlan,
+      switchCurrentDay,
+      planTripRoutes,
+      showDayDecisionHints
+    });
+
+    commandBus.emit(tripCommands.travelModeSelected("walk"));
+    await flush();
+
+    expect(planTripRoutes).toHaveBeenCalledWith({
+      tripPlan: exampleTripPlan,
+      dayId: "day-1",
+      modes: ["walk"]
+    });
+    expect(showDayDecisionHints).toHaveBeenCalledWith({
+      tripPlan: exampleTripPlan,
+      dayId: "day-1",
+      navigationPlan: exampleNavigationPlan,
+      defaultBufferMinutes: 15
+    });
+    expect(useTripViewStore.getState().selectedTravelMode).toBe("walk");
 
     stop();
   });

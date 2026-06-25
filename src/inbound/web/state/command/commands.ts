@@ -13,5 +13,9 @@ export const tripCommands = {
   mapPointSelected: (dayId: string): TripUiCommand => ({
     type: TRIP_UI_COMMANDS.mapPointSelected,
     dayId
+  }),
+  travelModeSelected: (mode: "walk" | "transit" | "drive"): TripUiCommand => ({
+    type: TRIP_UI_COMMANDS.travelModeSelected,
+    mode
   })
 };

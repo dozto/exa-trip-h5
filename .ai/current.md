@@ -4,12 +4,11 @@
 
 ## 当前焦点
 
-<!-- 正在进行的特性 / 变更，链接活跃 RFC。
-示例：- 实现 checkout 结算，见 [RFC-0001](rfcs/RFC-0001-checkout.md) -->
-
 - 结构改造已进入稳定阶段：`src/features` 平铺、`src/inbound`/`src/outbound`/`src/bootstrap` 分层协作（见 [RFC-0001](./rfcs/RFC-0001-itinerary-h5-module-split.md)）。
-- 当前重点是收敛 itinerary 页面模型与地图联动交互，持续清理无用代码并保持文档同步。
 - inbound web 已完成目录语义收敛：`events/` 承载事件总线机制，`state` 细分为 `command/state/store`，`styles` 拆分为 `index + pages + components`。
+- Mapbox 实时能力文档已收口（见 [RFC-0002](./rfcs/RFC-0002-mapbox-live-navigation.md)，状态 `accepted`）。
+- 实时能力已形成双 feature：`plan-trip-routes`（路线预估）+ `show-day-decision-hints`（事件预估与衔接可行性），并由 `view-itinerary` 聚合编排（见 [RFC-0003](./rfcs/RFC-0003-decision-hints-and-view-orchestration.md)）。
+- 最近 tiny-change：`.env` 纳入 gitignore 并补 `.env.example`；移除未接入的 `bootstrap/node.ts`，Mapbox 接入收敛为前端公开 token 直连单模式；统一领域术语 `RoutePlan` → `NavigationPlan`（见 `.ai/rfcs/tiny-change-2026-06-25-cleanup-and-terminology.md`）。
 
 ## 系统现状
 
@@ -19,6 +18,7 @@
 - 已建立本地预览链路：Vite `bun run dev`，默认读取 `src/mocks` 下的 mock 数据。
 - 架构校验、DDD 校验与文档同步校验已可通过脚本验证。
 - UI 已完成 HeroUI + Tailwind v4 初始化，地图页支持日期切换、点位点击与浮层详情展示。
+- 地图浮层已接入决策提示摘要（建议出发时间、迟到风险、衔接可行性），并支持点击联动右侧活动卡定位。
 - 页面交互链路已收敛为“驱动侧输入 -> 应用层编排 -> 应用状态更新 -> 驱动侧渲染”的闭环。
 - outbound 命名已统一为后缀风格：`*.repository.ts`、`*.validator.ts`（例如 `mock-trip-plan.repository.ts`、`trip-plan-schema.validator.ts`）。
 
@@ -30,3 +30,5 @@
 - JSON Schema 为生成产物，需通过 `bun run generate:contracts` 统一更新。
 - 生产构建存在体积告警（单 chunk > 500kb），后续需做拆包优化。
 - 应用层协作机制当前聚焦单页内交互分发，尚未扩展到跨页面编排。
+- Mapbox 接入当前为单模式：前端使用公开 token 直连；`bootstrap/node` 代理策略已移除，待后续如需生产代理再以新 RFC 启动。公共交通当前仍为估算能力（驱动路线 + 时长系数），未接入独立 transit provider。
+- 若后续收敛为"严格代理"策略，需要新增 `bootstrap/node` 并补齐对应 RFC、配置与测试迁移计划。
