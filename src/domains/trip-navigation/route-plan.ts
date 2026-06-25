@@ -8,6 +8,7 @@ export type FeasibilityLevel = "feasible" | "tight" | "infeasible";
 
 export type RouteOption = {
   mode: TravelMode;
+  strategy?: RouteStrategy;
   durationMinutes: number;
   distanceKm: number;
   estimatedCost?: number;
@@ -61,5 +62,11 @@ export {
   estimateEventRisk,
   filterModesByContext,
   recommendMode,
+  selectLegsForPlace,
   selectOptionByStrategy
 } from "./route-plan.methods";
+
+export type PlaceFocusLegs = {
+  predecessor: RouteLeg | null;
+  successor: RouteLeg | null;
+};

@@ -66,10 +66,15 @@
   gap: 10px;
 }
 
-.map-tool-button {
+.map-tool-button:not([aria-pressed="true"]) {
   border: 1px solid rgba(148, 163, 184, 0.26);
   background: rgba(255, 255, 255, 0.82);
   box-shadow: 0 12px 20px -20px rgba(15, 23, 42, 0.7);
+}
+
+.map-tool-button[aria-pressed="true"] {
+  border: 1px solid transparent;
+  box-shadow: 0 8px 18px -10px rgba(13, 148, 136, 0.6);
 }
 
 .map-tool-icon {

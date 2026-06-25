@@ -1,8 +1,8 @@
 import { create } from "zustand";
-import type { DayDecisionHints, NavigationPlan, TravelMode } from "../../../../domains/trip-navigation/route-plan";
+import type { DayDecisionHints, NavigationPlan, RouteStrategy } from "../../../../domains/trip-navigation/route-plan";
 import type { TripPlan } from "../../../../domains/trip-planning/trip-plan";
 
-type SupportedTravelMode = TravelMode;
+type ViewLevel = "overview" | "day" | "place";
 
 export type TripViewState = {
   tripPlan: TripPlan | null;
@@ -11,7 +11,9 @@ export type TripViewState = {
   errorMessage: string | null;
   navigationPlan: NavigationPlan | null;
   dayDecisionHints: DayDecisionHints | null;
-  selectedTravelMode: SupportedTravelMode;
+  selectedStrategy: RouteStrategy;
+  viewLevel: ViewLevel;
+  selectedPlaceId: string | null;
   navigationPlanWarning: string | null;
   decisionHintsWarning: string | null;
   loadStarted: () => void;
@@ -19,7 +21,10 @@ export type TripViewState = {
   loadFailed: (message: string) => void;
   daySwitchSucceeded: (dayId: string) => void;
   daySwitchFailed: (message: string) => void;
-  travelModeSelected: (mode: SupportedTravelMode) => void;
+  strategySelected: (strategy: RouteStrategy) => void;
+  placeSelected: (placeId: string) => void;
+  goToDayView: () => void;
+  goToOverview: () => void;
   navigationPlanSucceeded: (navigationPlan: NavigationPlan | null) => void;
   navigationPlanFailed: (message: string) => void;
   decisionHintsSucceeded: (hints: DayDecisionHints | null) => void;
@@ -33,7 +38,9 @@ export const useTripViewStore = create<TripViewState>((set) => ({
   errorMessage: null,
   navigationPlan: null,
   dayDecisionHints: null,
-  selectedTravelMode: "drive",
+  selectedStrategy: "fastest",
+  viewLevel: "day",
+  selectedPlaceId: null,
   navigationPlanWarning: null,
   decisionHintsWarning: null,
   loadStarted: () =>
@@ -51,7 +58,9 @@ export const useTripViewStore = create<TripViewState>((set) => ({
       errorMessage: null,
       navigationPlanWarning: null,
       decisionHintsWarning: null,
-      dayDecisionHints: null
+      dayDecisionHints: null,
+      viewLevel: "day",
+      selectedPlaceId: null
     }),
   loadFailed: (errorMessage) =>
     set({
@@ -63,16 +72,19 @@ export const useTripViewStore = create<TripViewState>((set) => ({
       currentDayId,
       errorMessage: null,
       dayDecisionHints: null,
-      decisionHintsWarning: null
+      decisionHintsWarning: null,
+      viewLevel: "day",
+      selectedPlaceId: null
     }),
   daySwitchFailed: (errorMessage) =>
     set({
       errorMessage
     }),
-  travelModeSelected: (selectedTravelMode) =>
-    set({
-      selectedTravelMode
-    }),
+  strategySelected: (selectedStrategy) => set({ selectedStrategy }),
+  placeSelected: (placeId) =>
+    set({ viewLevel: "place", selectedPlaceId: placeId }),
+  goToDayView: () => set({ viewLevel: "day", selectedPlaceId: null }),
+  goToOverview: () => set({ viewLevel: "overview", selectedPlaceId: null, currentDayId: null, dayDecisionHints: null }),
   navigationPlanSucceeded: (navigationPlan) =>
     set({
       navigationPlan,

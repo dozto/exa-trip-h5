@@ -1,4 +1,4 @@
-import type { TravelMode } from "../../../../domains/trip-navigation/route-plan";
+import type { RouteStrategy } from "../../../../domains/trip-navigation/route-plan";
 import type { TripUiCommand } from "./events";
 import { TRIP_UI_COMMANDS } from "./events";
 
@@ -15,8 +15,15 @@ export const tripCommands = {
     type: TRIP_UI_COMMANDS.mapPointSelected,
     dayId
   }),
-  travelModeSelected: (mode: TravelMode): TripUiCommand => ({
-    type: TRIP_UI_COMMANDS.travelModeSelected,
-    mode
+  strategySelected: (strategy: RouteStrategy): TripUiCommand => ({
+    type: TRIP_UI_COMMANDS.strategySelected,
+    strategy
+  }),
+  placeSelected: (placeId: string): TripUiCommand => ({
+    type: TRIP_UI_COMMANDS.placeSelected,
+    placeId
+  }),
+  viewEscaped: (): TripUiCommand => ({
+    type: TRIP_UI_COMMANDS.viewEscaped
   })
 };

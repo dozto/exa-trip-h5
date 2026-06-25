@@ -6,6 +6,7 @@ import {
   type RouteLeg,
   type RouteOption,
   type NavigationPlan,
+  type RouteStrategy,
   type TravelMode
 } from "../../domains/trip-navigation/route-plan";
 import { haversineDistanceKm } from "../../shared/geo";
@@ -13,18 +14,29 @@ import { err, ok } from "../../shared/result";
 import type { PlanTripRoutes, PlanTripRoutesDependencies, PlanTripRoutesInput } from "./port";
 
 const defaultModes: TravelMode[] = ["walk", "transit", "drive"];
+const defaultStrategies: RouteStrategy[] = ["fastest", "comfort", "cheapest"];
 
-const buildCacheKey = (input: PlanTripRoutesInput, modes: TravelMode[]): string => {
-  return `${input.tripPlan.tripId}:${input.dayId}:${modes.join("-")}:${input.departureTime ?? "now"}`;
+const buildCacheKey = (
+  input: PlanTripRoutesInput,
+  modes: TravelMode[],
+  strategies: RouteStrategy[]
+): string => {
+  return `${input.tripPlan.tripId}:${input.dayId}:${modes.join("-")}:${strategies.join("-")}:${input.departureTime ?? "now"}`;
 };
 
 export const createPlanTripRoutes = (deps: PlanTripRoutesDependencies): PlanTripRoutes => {
   const now = deps.now ?? (() => new Date());
 
   return async (input) => {
-    const modes = input.modes?.length ? input.modes : defaultModes;
+    const hasModes = Boolean(input.modes?.length);
+    const hasStrategies = Boolean(input.strategies?.length);
+
+    const modes = hasModes ? (input.modes as TravelMode[]) : defaultModes;
+    const strategies = hasStrategies ? (input.strategies as RouteStrategy[]) : defaultStrategies;
+    const legacySingleStrategyMode = hasModes && !hasStrategies;
+
     const departureTime = input.departureTime ?? now().toISOString();
-    const cacheKey = buildCacheKey(input, modes);
+    const cacheKey = buildCacheKey(input, modes, strategies);
     const places = buildDayPlaceSequence(input.tripPlan, input.dayId);
 
     if (places.length < 2) {
@@ -47,19 +59,25 @@ export const createPlanTripRoutes = (deps: PlanTripRoutesDependencies): PlanTrip
           continue;
         }
 
-        const options: RouteOption[] = [];
         const legModes = filterModesByContext(modes, {
           distanceKm: haversineDistanceKm(from, to)
         });
+        const legStrategies: RouteStrategy[] = legacySingleStrategyMode
+          ? ["fastest"]
+          : strategies;
 
-        for (const mode of legModes) {
-          const route = await deps.routingGateway.planRoute({
-            from,
-            to,
-            mode,
-            departureTime
-          });
-          options.push(route);
+        const options: RouteOption[] = [];
+        for (const strategy of legStrategies) {
+          for (const mode of legModes) {
+            const route = await deps.routingGateway.planRoute({
+              from,
+              to,
+              mode,
+              strategy,
+              departureTime
+            });
+            options.push({ ...route, strategy });
+          }
         }
 
         legs.push({
@@ -89,10 +107,11 @@ export const createPlanTripRoutes = (deps: PlanTripRoutesDependencies): PlanTrip
         });
       }
 
-      const message = error instanceof Error ? error.message : "Unknown route planning error";
-      return err({
-        code: "navigation_plan_failed",
-        message: `Failed to plan route for ${input.dayId}: ${message}`
+      return ok({
+        dayId: input.dayId,
+        legs: [],
+        updatedAt: now().toISOString(),
+        isFallback: true
       });
     }
   };

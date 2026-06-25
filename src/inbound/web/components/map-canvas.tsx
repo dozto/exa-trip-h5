@@ -1,8 +1,8 @@
 import { Chip } from "@heroui/react";
 import mapboxgl from "mapbox-gl";
 import { useEffect, useMemo, useRef } from "react";
-import type { TravelMode } from "../../../domains/trip-navigation/route-plan";
-import type { TripMapViewModel } from "../state/state/view-model";
+import type { RouteStrategy } from "../../../domains/trip-navigation/route-plan";
+import type { TripMapViewModel, ViewLevel } from "../state/state/view-model";
 import { MapToolbar } from "./map-toolbar";
 
 const formatDurationLabel = (durationMinutes: number): string => {
@@ -31,12 +31,21 @@ const feasibilityLabel: Record<"feasible" | "tight" | "infeasible", string> = {
   infeasible: "衔接不足"
 };
 
+const strategyLabel: Record<"fastest" | "comfort" | "cheapest", string> = {
+  fastest: "最快",
+  comfort: "舒适",
+  cheapest: "省钱"
+};
+
 type MapCanvasProps = {
   model: TripMapViewModel;
   isLoading: boolean;
   reduceMotion: boolean;
+  viewLevel: ViewLevel;
+  selectedPlaceId: string | null;
   onSelectPoint: (dayId: string) => void;
-  onSelectTravelMode: (mode: TravelMode) => void;
+  onSelectPlace: (placeId: string) => void;
+  onSelectStrategy: (strategy: RouteStrategy) => void;
   onSelectHintActivity: (activityId: string) => void;
 };
 
@@ -124,8 +133,11 @@ export const MapCanvas = ({
   model,
   isLoading,
   reduceMotion,
+  viewLevel,
+  selectedPlaceId,
   onSelectPoint,
-  onSelectTravelMode,
+  onSelectPlace,
+  onSelectStrategy,
   onSelectHintActivity
 }: MapCanvasProps) => {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
@@ -181,7 +193,18 @@ export const MapCanvas = ({
 
     for (const point of mapboxPoints) {
       const element = createMarkerElement(point, reduceMotion);
-      element.addEventListener("click", () => onSelectPoint(point.dayId));
+      const placeId = point.pointId.split(":")[1] ?? point.pointId;
+      element.addEventListener("click", () => {
+        if (viewLevel === "overview") {
+          onSelectPoint(point.dayId);
+          return;
+        }
+        if (viewLevel === "day") {
+          onSelectPlace(placeId);
+          return;
+        }
+        onSelectPlace(placeId);
+      });
 
       const marker = new mapboxgl.Marker({
         element,
@@ -194,18 +217,30 @@ export const MapCanvas = ({
     }
 
     if (mapboxPoints.length > 0) {
-      const bounds = new mapboxgl.LngLatBounds();
-      for (const point of mapboxPoints) {
-        bounds.extend([point.lng, point.lat]);
-      }
+      const focusPoint =
+        viewLevel === "place" && selectedPlaceId
+          ? mapboxPoints.find((point) => point.pointId.endsWith(`:${selectedPlaceId}`))
+          : null;
 
-      map.fitBounds(bounds, {
-        padding: { top: 160, right: 64, bottom: 120, left: 64 },
-        duration: reduceMotion ? 0 : 700,
-        maxZoom: 11
-      });
+      if (focusPoint) {
+        map.flyTo({
+          center: [focusPoint.lng, focusPoint.lat],
+          zoom: 14,
+          duration: reduceMotion ? 0 : 700
+        });
+      } else {
+        const bounds = new mapboxgl.LngLatBounds();
+        for (const point of mapboxPoints) {
+          bounds.extend([point.lng, point.lat]);
+        }
+        map.fitBounds(bounds, {
+          padding: { top: 160, right: 64, bottom: 120, left: 64 },
+          duration: reduceMotion ? 0 : 700,
+          maxZoom: viewLevel === "overview" ? 9 : 12
+        });
+      }
     }
-  }, [mapboxPoints, onSelectPoint, reduceMotion]);
+  }, [mapboxPoints, onSelectPoint, onSelectPlace, reduceMotion, viewLevel, selectedPlaceId]);
 
   useEffect(() => {
     const map = mapRef.current;
@@ -239,7 +274,7 @@ export const MapCanvas = ({
             {model.points.length} 个地点
           </Chip>
           <Chip size="sm" variant="flat">
-            {model.activeDayId ? "已定位当前日期" : "等待日期选择"}
+            {model.activeDayId ? "已定位当前日期" : model.viewLevel === "overview" ? "概览模式" : "等待日期选择"}
           </Chip>
           {model.routeSummary ? (
             <>
@@ -249,11 +284,9 @@ export const MapCanvas = ({
               <Chip size="sm" variant="flat">
                 约 {model.routeSummary.distanceKm} km
               </Chip>
-              {model.selectedTravelMode === "transit" ? (
-                <Chip size="sm" variant="flat" color="warning">
-                  公交时长为估算值
-                </Chip>
-              ) : null}
+              <Chip size="sm" variant="flat" color="secondary">
+                策略：{strategyLabel[model.selectedStrategy]}
+              </Chip>
             </>
           ) : null}
           {hintSummary ? (
@@ -305,9 +338,10 @@ export const MapCanvas = ({
 
       <div className="map-toolbar-dock">
         <MapToolbar
-          disabled={isLoading || model.points.length === 0}
-          selectedMode={model.selectedTravelMode}
-          onSelectMode={onSelectTravelMode}
+          disabled={isLoading || model.points.length === 0 || model.viewLevel === "overview"}
+          selectedStrategy={model.selectedStrategy}
+          walkOnlyDay={model.walkOnlyDay}
+          onSelectStrategy={onSelectStrategy}
         />
       </div>
 
@@ -322,8 +356,6 @@ export const MapCanvas = ({
       </div>
 
       <div className="map-legend" aria-hidden>
-        <span className="legend-dot legend-dot-active" /> 当前日期
-        <span className="legend-dot" /> 其他日期
         {model.routeSummary?.isFallback ? (
           <span className="map-legend-note">路线来自缓存 · {new Date(model.routeSummary.updatedAt).toLocaleTimeString()}</span>
         ) : null}

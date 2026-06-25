@@ -1,5 +1,5 @@
 import type { Place } from "../../domains/trip-planning/trip-plan";
-import type { NavigationPlan, RouteOption, TravelMode } from "../../domains/trip-navigation/route-plan";
+import type { NavigationPlan, RouteOption, RouteStrategy, TravelMode } from "../../domains/trip-navigation/route-plan";
 import type { AppError } from "../../shared/errors";
 import type { Result } from "../../shared/result";
 import type { PlanTripRoutesInput, PlanTripRoutesOutput } from "./types";
@@ -15,6 +15,7 @@ export interface RoutingGateway {
     from: Place;
     to: Place;
     mode: TravelMode;
+    strategy?: RouteStrategy;
     departureTime: string;
   }): Promise<RoutingRouteResult>;
 }

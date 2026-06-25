@@ -6,7 +6,8 @@ import type {
   NavigationPlan,
   RouteStrategy,
   TravelMode,
-  EventEstimate
+  EventEstimate,
+  PlaceFocusLegs
 } from "./route-plan";
 import { formatMinutesToTime, parseTimeToMinutes } from "../../shared/time";
 
@@ -36,6 +37,12 @@ export const selectOptionByStrategy = (
 ): RouteOption | null => {
   if (!options.length) {
     return null;
+  }
+
+  const matchingStrategy = options.filter((option) => option.strategy === strategy);
+
+  if (matchingStrategy.length > 0) {
+    return matchingStrategy[0] ?? null;
   }
 
   const sorted = [...options].sort((a, b) => {
@@ -89,6 +96,12 @@ export const buildRouteLegs = (placeSequence: { placeId: string }[]): RouteLeg[]
     });
   }
   return legs;
+};
+
+export const selectLegsForPlace = (legs: RouteLeg[], placeId: string): PlaceFocusLegs => {
+  const predecessor = legs.find((leg) => leg.toPlaceId === placeId) ?? null;
+  const successor = legs.find((leg) => leg.fromPlaceId === placeId) ?? null;
+  return { predecessor, successor };
 };
 
 export const estimateEventRisk = (input: {

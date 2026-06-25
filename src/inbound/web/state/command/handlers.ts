@@ -4,7 +4,7 @@ import type { ShowDayDecisionHints } from "../../../../features/show-day-decisio
 import type { SwitchCurrentDay } from "../../../../features/switch-current-day/port";
 import type { NavigationPlan, DayDecisionHints } from "../../../../domains/trip-navigation/route-plan";
 import type { TripPlan } from "../../../../domains/trip-planning/trip-plan";
-import type { TravelMode } from "../../../../domains/trip-navigation/route-plan";
+import type { RouteStrategy } from "../../../../domains/trip-navigation/route-plan";
 import type { TripUiCommandBus } from "../../events";
 import { tripCommands } from "./commands";
 import { TRIP_UI_COMMANDS } from "./events";
@@ -13,13 +13,18 @@ export type TripViewStoreApi = {
   getState: () => {
     tripPlan: TripPlan | null;
     currentDayId: string | null;
-    selectedTravelMode: TravelMode;
+    selectedStrategy: RouteStrategy;
+    viewLevel: "overview" | "day" | "place";
+    selectedPlaceId: string | null;
     loadStarted: () => void;
     loadSucceeded: (tripPlan: TripPlan, currentDayId: string) => void;
     loadFailed: (message: string) => void;
     daySwitchSucceeded: (currentDayId: string) => void;
     daySwitchFailed: (message: string) => void;
-    travelModeSelected: (mode: TravelMode) => void;
+    strategySelected: (strategy: RouteStrategy) => void;
+    placeSelected: (placeId: string) => void;
+    goToDayView: () => void;
+    goToOverview: () => void;
     navigationPlanSucceeded: (navigationPlan: NavigationPlan | null) => void;
     navigationPlanFailed: (message: string) => void;
     decisionHintsSucceeded: (hints: DayDecisionHints | null) => void;
@@ -39,19 +44,22 @@ type TripModelHandlerDependencies = {
 export const registerTripModelHandlers = (
   deps: TripModelHandlerDependencies
 ): (() => void) => {
+  const dependencies = deps;
+
   const refreshDayDecisionHints = async (input: {
     dayId: string;
     navigationPlan: NavigationPlan;
   }) => {
-    const state = deps.store.getState();
+    const state = dependencies.store.getState();
     if (!state.tripPlan) {
       return;
     }
 
-    const decisionHints = await deps.showDayDecisionHints({
+    const decisionHints = await dependencies.showDayDecisionHints({
       tripPlan: state.tripPlan,
       dayId: input.dayId,
       navigationPlan: input.navigationPlan,
+      strategy: state.selectedStrategy,
       defaultBufferMinutes: 15
     });
 
@@ -63,11 +71,29 @@ export const registerTripModelHandlers = (
     state.decisionHintsSucceeded(decisionHints.value);
   };
 
-  const stopPageOpened = deps.commandBus.on(TRIP_UI_COMMANDS.pageOpened, async (command) => {
-    const state = deps.store.getState();
+  const planAllStrategyRoutesForCurrentDay = async (input: {
+    tripPlan: TripPlan;
+    dayId: string;
+  }) => {
+    const liveResult = await dependencies.planTripRoutes({
+      tripPlan: input.tripPlan,
+      dayId: input.dayId
+    });
+
+    if (!liveResult.ok) {
+      dependencies.store.getState().navigationPlanFailed(liveResult.error.message);
+      return null;
+    }
+
+    dependencies.store.getState().navigationPlanSucceeded(liveResult.value);
+    return liveResult.value;
+  };
+
+  const stopPageOpened = dependencies.commandBus.on(TRIP_UI_COMMANDS.pageOpened, async (command) => {
+    const state = dependencies.store.getState();
     state.loadStarted();
 
-    const result = await deps.loadTripPlan({ tripId: command.tripId });
+    const result = await dependencies.loadTripPlan({ tripId: command.tripId });
     if (!result.ok) {
       state.loadFailed(result.error.message);
       return;
@@ -75,95 +101,87 @@ export const registerTripModelHandlers = (
 
     state.loadSucceeded(result.value.tripPlan, result.value.currentDayId);
 
-    const liveResult = await deps.planTripRoutes({
+    const navigationPlan = await planAllStrategyRoutesForCurrentDay({
       tripPlan: result.value.tripPlan,
-      dayId: result.value.currentDayId,
-      modes: [state.selectedTravelMode]
+      dayId: result.value.currentDayId
     });
-    if (!liveResult.ok) {
-      state.navigationPlanFailed(liveResult.error.message);
-      return;
+    if (navigationPlan) {
+      await refreshDayDecisionHints({
+        dayId: result.value.currentDayId,
+        navigationPlan
+      });
     }
-    state.navigationPlanSucceeded(liveResult.value);
-    await refreshDayDecisionHints({
-      dayId: result.value.currentDayId,
-      navigationPlan: liveResult.value
-    });
   });
 
   const handleSwitchDay = async (dayId: string) => {
-    const result = await deps.switchCurrentDay({ dayId });
+    const result = await dependencies.switchCurrentDay({ dayId });
     if (!result.ok) {
-      deps.store.getState().daySwitchFailed(result.error.message);
+      dependencies.store.getState().daySwitchFailed(result.error.message);
       return;
     }
 
-    const state = deps.store.getState();
+    const state = dependencies.store.getState();
     state.daySwitchSucceeded(result.value.currentDayId);
 
     if (!state.tripPlan) {
       return;
     }
-    const liveResult = await deps.planTripRoutes({
+    const navigationPlan = await planAllStrategyRoutesForCurrentDay({
       tripPlan: state.tripPlan,
-      dayId: result.value.currentDayId,
-      modes: [state.selectedTravelMode]
+      dayId: result.value.currentDayId
     });
-    if (!liveResult.ok) {
-      state.navigationPlanFailed(liveResult.error.message);
-      return;
+    if (navigationPlan) {
+      await refreshDayDecisionHints({
+        dayId: result.value.currentDayId,
+        navigationPlan
+      });
     }
-    state.navigationPlanSucceeded(liveResult.value);
-    await refreshDayDecisionHints({
-      dayId: result.value.currentDayId,
-      navigationPlan: liveResult.value
-    });
   };
 
-  const stopDaySelected = deps.commandBus.on(TRIP_UI_COMMANDS.daySelected, async (command) => {
+  const stopDaySelected = dependencies.commandBus.on(TRIP_UI_COMMANDS.daySelected, async (command) => {
     await handleSwitchDay(command.dayId);
   });
 
-  const stopMapPointSelected = deps.commandBus.on(
+  const stopMapPointSelected = dependencies.commandBus.on(
     TRIP_UI_COMMANDS.mapPointSelected,
     async (command) => {
       await handleSwitchDay(command.dayId);
     }
   );
 
-  const stopTravelModeSelected = deps.commandBus.on(
-    TRIP_UI_COMMANDS.travelModeSelected,
+  const stopStrategySelected = dependencies.commandBus.on(
+    TRIP_UI_COMMANDS.strategySelected,
     async (command) => {
-      const state = deps.store.getState();
-      state.travelModeSelected(command.mode);
-      if (!state.tripPlan || !state.currentDayId) {
-        return;
-      }
-
-      const liveResult = await deps.planTripRoutes({
-        tripPlan: state.tripPlan,
-        dayId: state.currentDayId,
-        modes: [command.mode]
-      });
-
-      if (!liveResult.ok) {
-        state.navigationPlanFailed(liveResult.error.message);
-        return;
-      }
-
-      state.navigationPlanSucceeded(liveResult.value);
-      await refreshDayDecisionHints({
-        dayId: state.currentDayId,
-        navigationPlan: liveResult.value
-      });
+      const state = dependencies.store.getState();
+      state.strategySelected(command.strategy);
     }
   );
+
+  const stopPlaceSelected = dependencies.commandBus.on(
+    TRIP_UI_COMMANDS.placeSelected,
+    async (command) => {
+      dependencies.store.getState().placeSelected(command.placeId);
+    }
+  );
+
+  const stopViewEscaped = dependencies.commandBus.on(TRIP_UI_COMMANDS.viewEscaped, async () => {
+    const state = dependencies.store.getState();
+    if (state.viewLevel === "place") {
+      state.goToDayView();
+      return;
+    }
+    if (state.viewLevel === "day") {
+      state.goToOverview();
+    }
+  });
 
   return () => {
     stopPageOpened();
     stopDaySelected();
     stopMapPointSelected();
-    stopTravelModeSelected();
+    stopStrategySelected();
+    stopPlaceSelected();
+    stopViewEscaped();
   };
 };
 

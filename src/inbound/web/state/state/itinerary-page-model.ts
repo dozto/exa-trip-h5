@@ -1,12 +1,14 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
+  buildPlaceFocusCardModel,
   buildTripCurrentCardModel,
   buildTripDateStripModel,
   buildTripHeaderModel,
   buildTripMapModel,
+  buildTripOverviewModel,
   buildTripTipsModel
 } from "./view-model";
-import type { TravelMode } from "../../../../domains/trip-navigation/route-plan";
+import type { RouteStrategy } from "../../../../domains/trip-navigation/route-plan";
 import { tripCommands } from "../command/commands";
 import { useTripModelRuntime } from "../store/runtime-context";
 import { selectCurrentDay } from "./selectors";
@@ -25,7 +27,9 @@ export const useItineraryPageModel = () => {
   const dayDecisionHints = useTripViewStore((state) => state.dayDecisionHints);
   const navigationPlanWarning = useTripViewStore((state) => state.navigationPlanWarning);
   const decisionHintsWarning = useTripViewStore((state) => state.decisionHintsWarning);
-  const selectedTravelMode = useTripViewStore((state) => state.selectedTravelMode);
+  const selectedStrategy = useTripViewStore((state) => state.selectedStrategy);
+  const viewLevel = useTripViewStore((state) => state.viewLevel);
+  const selectedPlaceId = useTripViewStore((state) => state.selectedPlaceId);
 
   const currentDay = useMemo(() => selectCurrentDay(tripPlan, currentDayId), [tripPlan, currentDayId]);
   const headerModel = useMemo(() => buildTripHeaderModel(tripPlan), [tripPlan]);
@@ -34,6 +38,7 @@ export const useItineraryPageModel = () => {
     () => buildTripDateStripModel(tripPlan, currentDayId),
     [tripPlan, currentDayId]
   );
+  const overviewModel = useMemo(() => buildTripOverviewModel(tripPlan), [tripPlan]);
   const mapModel = useMemo(
     () =>
       buildTripMapModel(
@@ -41,13 +46,27 @@ export const useItineraryPageModel = () => {
         currentDayId,
         navigationPlan,
         dayDecisionHints,
-        selectedTravelMode
+        selectedStrategy,
+        viewLevel,
+        selectedPlaceId
       ),
-    [tripPlan, currentDayId, navigationPlan, dayDecisionHints, selectedTravelMode]
+    [tripPlan, currentDayId, navigationPlan, dayDecisionHints, selectedStrategy, viewLevel, selectedPlaceId]
   );
   const currentCardModel = useMemo(
-    () => buildTripCurrentCardModel(tripPlan, currentDay, tipsModel, dayDecisionHints),
-    [tripPlan, currentDay, tipsModel, dayDecisionHints]
+    () => buildTripCurrentCardModel(tripPlan, currentDay, tipsModel, dayDecisionHints, navigationPlan, selectedStrategy),
+    [tripPlan, currentDay, tipsModel, dayDecisionHints, navigationPlan, selectedStrategy]
+  );
+  const placeFocusCardModel = useMemo(
+    () =>
+      buildPlaceFocusCardModel(
+        tripPlan,
+        currentDayId,
+        selectedPlaceId,
+        navigationPlan,
+        dayDecisionHints,
+        selectedStrategy
+      ),
+    [tripPlan, currentDayId, selectedPlaceId, navigationPlan, dayDecisionHints, selectedStrategy]
   );
 
   const onSwitchDay = useCallback((dayId: string) => {
@@ -58,9 +77,16 @@ export const useItineraryPageModel = () => {
     commandBus.emit(tripCommands.mapPointSelected(dayId));
   }, [commandBus]);
 
-  const onSelectTravelMode = useCallback(
-    (mode: TravelMode) => {
-      commandBus.emit(tripCommands.travelModeSelected(mode));
+  const onSelectStrategy = useCallback(
+    (strategy: RouteStrategy) => {
+      commandBus.emit(tripCommands.strategySelected(strategy));
+    },
+    [commandBus]
+  );
+
+  const onSelectPlace = useCallback(
+    (placeId: string) => {
+      commandBus.emit(tripCommands.placeSelected(placeId));
     },
     [commandBus]
   );
@@ -72,6 +98,14 @@ export const useItineraryPageModel = () => {
   const onClearFocusedActivity = useCallback(() => {
     setFocusedActivityId(null);
   }, []);
+
+  const onViewEscape = useCallback(() => {
+    commandBus.emit(tripCommands.viewEscaped());
+  }, [commandBus]);
+
+  const onClosePlaceFocus = useCallback(() => {
+    commandBus.emit(tripCommands.viewEscaped());
+  }, [commandBus]);
 
   useEffect(() => {
     commandBus.emit(tripCommands.pageOpened(defaultTripId));
@@ -86,15 +120,23 @@ export const useItineraryPageModel = () => {
     dateStripModel,
     mapModel,
     currentCardModel,
+    overviewModel,
+    placeFocusCardModel,
     focusedActivityId,
     isLoading,
     errorMessage,
     navigationPlanWarning,
     decisionHintsWarning,
+    selectedStrategy,
+    viewLevel,
+    selectedPlaceId,
     onSwitchDay,
     onSelectMapPoint,
-    onSelectTravelMode,
+    onSelectStrategy,
+    onSelectPlace,
     onSelectHintActivity,
-    onClearFocusedActivity
+    onClearFocusedActivity,
+    onViewEscape,
+    onClosePlaceFocus
   };
 };

@@ -111,6 +111,28 @@ export const ItineraryLocationCard = ({
             ))}
           </section>
 
+          {model.legSummaries.length > 0 ? (
+            <>
+              <Divider className="location-divider" />
+              <section className="location-items">
+                {model.legSummaries.map((leg) => (
+                  <article key={leg.legId} className="location-item">
+                    <div className="location-item-top">
+                      <h4>{leg.fromName} → {leg.toName}</h4>
+                      <Chip size="sm" variant="flat">
+                        {{ walk: "步行", transit: "公交", drive: "驾车" }[leg.mode ?? "walk"] ?? leg.mode}
+                      </Chip>
+                    </div>
+                    <div className="location-item-meta">
+                      <span>预计 {leg.durationMinutes} 分钟</span>
+                      <span>约 {leg.distanceKm} km</span>
+                    </div>
+                  </article>
+                ))}
+              </section>
+            </>
+          ) : null}
+
           <Divider className="location-divider" />
 
           <section className="location-tips-grid">

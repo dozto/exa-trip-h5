@@ -26,7 +26,8 @@
 ## 5. 核心概念（统一语言）
 - `NavigationPlan`：一次计划内全部路线与事件预估结果。
 - `RouteLeg`：相邻两个活动地点之间的一段出行。
-- `RouteOption`：某段出行在特定策略下的一种可选路线方案。
+- `RouteOption`：某段出行在特定策略下的一种可选路线方案（携带 `strategy` 标签：`fastest` / `comfort` / `cheapest`）。
+- `PlaceFocusLegs`：以某地点为视角的前序/后继 leg 对（`predecessor` / `successor`），支撑景点聚焦视图。
 - `TransportModeEstimate`：某交通方式下的时长、费用、换乘/停车等预估。
 - `EventEstimate`：面向活动的时间风险预估（建议出发、缓冲、准点概率、超时风险）。
 - `FeasibilityAssessment`：多活动串联后的可达性评估（可行/紧张/不可行）。
@@ -58,9 +59,10 @@
 
 ## 9. 领域方法（Domain Methods）
 - `filterModesByContext(modes, context)`：按出行上下文筛选可用 mode（如短距离优先步行）。
-- `selectOptionByStrategy(options, strategy)`：按策略选择候选路段。
+- `selectOptionByStrategy(options, strategy)`：按策略选择候选路段；若 options 带 `strategy` 字段则优先按字段匹配，否则退化为比较器排序。
 - `recommendMode(options, strategy)`：给出推荐出行方式。
 - `buildRouteLegs(placeSequence)`：基于地点序列构建路段骨架。
+- `selectLegsForPlace(legs, placeId)`：以某地点为视角返回前序/后继 leg 对（`PlaceFocusLegs`），支撑景点聚焦视图。
 - `estimateEventRisk(input)`：计算活动级出发建议与风险等级。
 - `assessDayFeasibility(links)`：计算相邻活动衔接可行性与调整建议。
 - `composeNavigationPlan(input)`：组装标准化 `NavigationPlan` 结果。

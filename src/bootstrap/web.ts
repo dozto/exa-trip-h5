@@ -10,6 +10,7 @@ import { registerTripModelHandlers } from "../inbound/web/state/command/handlers
 import { useTripViewStore } from "../inbound/web/state/store/view-store";
 import { MapboxRoutingGateway } from "../outbound/gateways/mapbox-routing.gateway";
 import { MockRoutingGateway } from "../outbound/gateways/mock-routing.gateway";
+import { FallbackRoutingGateway } from "../outbound/gateways/fallback-routing.gateway";
 import { InMemoryLiveCacheRepository } from "../outbound/repositories/in-memory-live-cache.repository";
 
 export const bootstrapWebApp = (): TripModelRuntime => {
@@ -22,11 +23,13 @@ export const bootstrapWebApp = (): TripModelRuntime => {
   });
   const liveCacheRepository = new InMemoryLiveCacheRepository();
   const mapboxAccessToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
+  const mockGateway = new MockRoutingGateway();
   const routingGateway = mapboxAccessToken
-    ? new MapboxRoutingGateway({
-        accessToken: mapboxAccessToken
+    ? new FallbackRoutingGateway({
+        primary: new MapboxRoutingGateway({ accessToken: mapboxAccessToken }),
+        fallback: mockGateway
       })
-    : new MockRoutingGateway();
+    : mockGateway;
 
   const planTripRoutes = createPlanTripRoutes({
     routingGateway,

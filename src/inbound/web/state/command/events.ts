@@ -1,10 +1,12 @@
-import type { TravelMode } from "../../../../domains/trip-navigation/route-plan";
+import type { RouteStrategy } from "../../../../domains/trip-navigation/route-plan";
 
 export const TRIP_UI_COMMANDS = {
   pageOpened: "page-opened",
   daySelected: "day-selected",
   mapPointSelected: "map-point-selected",
-  travelModeSelected: "travel-mode-selected"
+  strategySelected: "strategy-selected",
+  placeSelected: "place-selected",
+  viewEscaped: "view-escaped"
 } as const;
 
 export type TripUiCommand =
@@ -21,8 +23,15 @@ export type TripUiCommand =
       dayId: string;
     }
   | {
-      type: (typeof TRIP_UI_COMMANDS)["travelModeSelected"];
-      mode: TravelMode;
+      type: (typeof TRIP_UI_COMMANDS)["strategySelected"];
+      strategy: RouteStrategy;
+    }
+  | {
+      type: (typeof TRIP_UI_COMMANDS)["placeSelected"];
+      placeId: string;
+    }
+  | {
+      type: (typeof TRIP_UI_COMMANDS)["viewEscaped"];
     };
 
 export type TripUiCommandType = TripUiCommand["type"];

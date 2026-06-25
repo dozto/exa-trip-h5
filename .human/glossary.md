@@ -30,3 +30,8 @@
 | 规划日路线 PlanTripRoutes | 基于当天地点序列计算路线候选并支持缓存降级 | plan-trip-routes |
 | 展示决策提示 ShowDayDecisionHints | 基于路线和活动时间窗生成出发建议与风险提示 | show-day-decision-hints |
 | 前端代理 BFF | 前端后端代理层（鉴权/限流/缓存/错误翻译）；当前未实现，预留概念 | platform |
+| 视图层级 ViewLevel | 行程查看的三层聚焦状态：overview / day / place | view-itinerary |
+| 选中景点 SelectedPlace | 用户当前聚焦查看的地点 ID（仅在 viewLevel=place 时有效） | view-itinerary |
+| 选中路线策略 SelectedStrategy | 当前驱动路线展示的策略（fastest / comfort / cheapest），默认 fastest | view-itinerary |
+| 景点聚焦卡片 PlaceFocusCard | L2 视图右侧大面板，展示该景点详情及前序/后继 leg 路线与事件预估 | view-itinerary |
+| 行程总览卡 OverviewCard | L0 视图右侧摘要：天数、地点数、行程跨度等总览信息 | view-itinerary |

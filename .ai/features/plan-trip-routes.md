@@ -14,11 +14,13 @@
 
 ## inbound ports（触发入口）
 
-- `PlanTripRoutes({ tripPlan, dayId, departureTime, modes }) -> Result<NavigationPlan, AppError>`
+- `PlanTripRoutes({ tripPlan, dayId, departureTime, strategies?, modes? }) -> Result<NavigationPlan, AppError>`
+  - 优先使用 `strategies`（fastest / comfort / cheapest）；若仅提供 `modes` 则走兼容路径，每 leg 只产出 fastest 单方案。
+  - 默认未提供两者时使用 `strategies = ["fastest", "comfort", "cheapest"]`。
 
 ## outbound ports（被驱动依赖）
 
-- `RoutingGateway.planRoute({ from, to, mode, departureTime })`
+- `RoutingGateway.planRoute({ from, to, mode, strategy?, departureTime })`
 - `LiveCacheRepository.getNavigationPlan(cacheKey)`
 - `LiveCacheRepository.setNavigationPlan(cacheKey, value, ttlSeconds)`
 
@@ -26,9 +28,9 @@
 
 1. 使用 `trip-planning.buildDayPlaceSequence` 读取当天地点序列。
 2. 若地点少于 2 个，直接返回空路线语义。
-3. 对每个路段先调用 `trip-navigation.filterModesByContext` 过滤 mode（短距离优先仅步行），再调用 `RoutingGateway.planRoute` 获取候选。
-4. 使用 `trip-navigation.recommendMode` 计算每段推荐方式。
-5. 组合为 `NavigationPlan`，写入短 TTL 缓存。
+3. 对每个路段先调用 `trip-navigation.filterModesByContext` 过滤 mode（短距离优先仅步行），再按 `strategies × modes` 笛卡尔积调用 `RoutingGateway.planRoute`（含 `strategy` 入参）获取候选。
+4. 每个 `RouteOption` 由结果补上 `strategy` 标签；`recommendedMode` 由 `recommendMode(options, "fastest")` 计算。
+5. 组合为 `NavigationPlan`，写入短 TTL 缓存（缓存 key 含策略集合）。
 6. 若外部调用失败，优先返回缓存并标记 `isFallback=true`。
 
 ## 依赖
@@ -47,7 +49,7 @@
 ## 链接
 
 - 代码：`src/features/plan-trip-routes/`
-- RFC：`.ai/rfcs/RFC-0002-mapbox-live-navigation.md`
+- RFC：`.ai/rfcs/RFC-0002-mapbox-live-navigation.md`、`.ai/rfcs/RFC-0004-place-focus-view-and-strategy-routing.md`
 
 ## 验收标准（可测试）
 

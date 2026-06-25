@@ -1,32 +1,41 @@
 import { Button } from "@heroui/react";
-import type { TravelMode } from "../../../domains/trip-navigation/route-plan";
+import type { RouteStrategy } from "../../../domains/trip-navigation/route-plan";
 
 type MapToolbarProps = {
   disabled: boolean;
-  selectedMode: TravelMode;
-  onSelectMode: (mode: TravelMode) => void;
+  selectedStrategy: RouteStrategy;
+  walkOnlyDay: boolean;
+  onSelectStrategy: (strategy: RouteStrategy) => void;
 };
 
-const modeActions: Array<{ id: TravelMode; label: string }> = [
-  { id: "walk", label: "步行" },
-  { id: "transit", label: "公交" },
-  { id: "drive", label: "驾车" }
+const allActions: Array<{ id: RouteStrategy; label: string }> = [
+  { id: "fastest", label: "最快" },
+  { id: "comfort", label: "舒适" },
+  { id: "cheapest", label: "省钱" }
 ];
 
-export const MapToolbar = ({ disabled, selectedMode, onSelectMode }: MapToolbarProps) => {
+export const MapToolbar = ({
+  disabled,
+  selectedStrategy,
+  walkOnlyDay,
+  onSelectStrategy
+}: MapToolbarProps) => {
+  const actions = walkOnlyDay ? allActions.slice(0, 1) : allActions;
+
   return (
-    <div className="map-toolbar" role="toolbar" aria-label="出行方式切换">
-      {modeActions.map((action) => (
+    <div className="map-toolbar" role="toolbar" aria-label="路线策略切换">
+      {actions.map((action) => (
         <Button
           key={action.id}
           size="sm"
           radius="full"
-          variant={selectedMode === action.id ? "solid" : "flat"}
-          color={selectedMode === action.id ? "primary" : "default"}
+          variant={selectedStrategy === action.id ? "solid" : "flat"}
+          color={selectedStrategy === action.id ? "primary" : "default"}
           className="map-tool-button"
           isDisabled={disabled}
           aria-label={action.label}
-          onPress={() => onSelectMode(action.id)}
+          aria-pressed={selectedStrategy === action.id}
+          onPress={() => onSelectStrategy(action.id)}
         >
           {action.label}
         </Button>

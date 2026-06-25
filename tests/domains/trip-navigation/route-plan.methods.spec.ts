@@ -5,9 +5,11 @@ import {
   composeNavigationPlan,
   estimateEventRisk,
   filterModesByContext,
+  recommendMode,
+  selectLegsForPlace,
   selectOptionByStrategy
 } from "../../../src/domains/trip-navigation/route-plan.methods";
-import type { NavigationPlan, RouteOption, TravelMode } from "../../../src/domains/trip-navigation/route-plan";
+import type { NavigationPlan, RouteLeg, RouteOption, TravelMode } from "../../../src/domains/trip-navigation/route-plan";
 
 const makeOption = (mode: TravelMode, durationMinutes: number, distanceKm = 1.0): RouteOption => ({
   mode,
@@ -186,5 +188,121 @@ describe("composeNavigationPlan", () => {
     expect(plan.dayId).toBe("day-1");
     expect(plan.legs).toEqual([]);
     expect(plan.isFallback).toBe(false);
+  });
+});
+
+describe("selectOptionByStrategy strategy-aware options", () => {
+  it("prefers the option tagged with the requested strategy when present", () => {
+    const options: RouteOption[] = [
+      { ...makeOption("walk", 30, 2), strategy: "fastest" },
+      { ...makeOption("drive", 12, 2), strategy: "cheapest" },
+      { ...makeOption("transit", 25, 2), strategy: "comfort" }
+    ];
+
+    expect(selectOptionByStrategy(options, "comfort")?.mode).toBe("transit");
+    expect(selectOptionByStrategy(options, "cheapest")?.mode).toBe("drive");
+    expect(selectOptionByStrategy(options, "fastest")?.mode).toBe("walk");
+  });
+
+  it("falls back to comparator-based selection when no option matches the strategy field", () => {
+    const mixed: RouteOption[] = [
+      { ...makeOption("walk", 30, 2) },
+      { ...makeOption("drive", 10, 2) }
+    ];
+
+    expect(selectOptionByStrategy(mixed, "fastest")?.mode).toBe("drive");
+  });
+
+  it("returns null for empty options even with strategy field present", () => {
+    expect(selectOptionByStrategy([], "comfort")).toBeNull();
+  });
+});
+
+describe("selectLegsForPlace", () => {
+  const buildLeg = (
+    legId: string,
+    fromPlaceId: string,
+    toPlaceId: string,
+    options: RouteOption[] = []
+  ): RouteLeg => ({ legId, fromPlaceId, toPlaceId, options, recommendedMode: null });
+
+  it("returns both predecessor and successor legs for a middle place", () => {
+    const legs: RouteLeg[] = [
+      buildLeg("p1->p2", "p1", "p2"),
+      buildLeg("p2->p3", "p2", "p3"),
+      buildLeg("p3->p4", "p3", "p4")
+    ];
+
+    const result = selectLegsForPlace(legs, "p2");
+    expect(result.predecessor?.legId).toBe("p1->p2");
+    expect(result.successor?.legId).toBe("p2->p3");
+  });
+
+  it("returns only successor for the first place (no predecessor)", () => {
+    const legs: RouteLeg[] = [
+      buildLeg("p1->p2", "p1", "p2"),
+      buildLeg("p2->p3", "p2", "p3")
+    ];
+
+    const result = selectLegsForPlace(legs, "p1");
+    expect(result.predecessor).toBeNull();
+    expect(result.successor?.legId).toBe("p1->p2");
+  });
+
+  it("returns only predecessor for the last place (no successor)", () => {
+    const legs: RouteLeg[] = [
+      buildLeg("p1->p2", "p1", "p2"),
+      buildLeg("p2->p3", "p2", "p3")
+    ];
+
+    const result = selectLegsForPlace(legs, "p3");
+    expect(result.predecessor?.legId).toBe("p2->p3");
+    expect(result.successor).toBeNull();
+  });
+
+  it("returns null/null for a place not in any leg", () => {
+    const legs: RouteLeg[] = [buildLeg("p1->p2", "p1", "p2")];
+
+    const result = selectLegsForPlace(legs, "pX");
+    expect(result.predecessor).toBeNull();
+    expect(result.successor).toBeNull();
+  });
+
+  it("returns null/null for empty legs", () => {
+    const result = selectLegsForPlace([], "p1");
+    expect(result.predecessor).toBeNull();
+    expect(result.successor).toBeNull();
+  });
+
+  it("handles single-leg list (two-place day) for the from-place", () => {
+    const legs: RouteLeg[] = [buildLeg("p1->p2", "p1", "p2")];
+
+    expect(selectLegsForPlace(legs, "p1").successor?.legId).toBe("p1->p2");
+    expect(selectLegsForPlace(legs, "p1").predecessor).toBeNull();
+    expect(selectLegsForPlace(legs, "p2").predecessor?.legId).toBe("p1->p2");
+    expect(selectLegsForPlace(legs, "p2").successor).toBeNull();
+  });
+
+  it("uses the first matching predecessor/successor whenMultiple legs share endpoints", () => {
+    const legs: RouteLeg[] = [
+      buildLeg("p1->p2:a", "p1", "p2"),
+      buildLeg("p1->p2:b", "p1", "p2"),
+      buildLeg("p2->p3", "p2", "p3")
+    ];
+
+    const result = selectLegsForPlace(legs, "p2");
+    expect(result.predecessor?.legId).toBe("p1->p2:a");
+    expect(result.successor?.legId).toBe("p2->p3");
+  });
+});
+
+describe("recommendMode with strategy-aware options", () => {
+  it("returns the mode of the strategy-selected option", () => {
+    const options: RouteOption[] = [
+      { ...makeOption("walk", 30, 2), strategy: "fastest" },
+      { ...makeOption("transit", 25, 2), strategy: "comfort" }
+    ];
+
+    expect(recommendMode(options, "comfort")).toBe("transit");
   });
 });

@@ -1,4 +1,12 @@
 import type { Place, TripDay, TripPlan } from "../../../../domains/trip-planning/trip-plan";
+import {
+  selectLegsForPlace,
+  selectOptionByStrategy,
+  type NavigationPlan,
+  type PlaceFocusLegs,
+  type RouteOption,
+  type RouteStrategy
+} from "../../../../domains/trip-navigation/route-plan";
 
 export type MapPointSelectorResult = {
   pointId: string;
@@ -75,16 +83,21 @@ export const selectCurrentDay = (
 
 export const selectMapPoints = (
   tripPlan: TripPlan | null,
-  currentDayId: string | null
+  currentDayId: string | null,
+  viewLevel: "overview" | "day" | "place" = "day"
 ): MapPointSelectorResult[] => {
   if (!tripPlan) {
     return [];
   }
 
-  const activeDayId = selectActiveDayId(tripPlan, currentDayId);
+  const activeDayId = viewLevel === "overview" ? null : selectActiveDayId(tripPlan, currentDayId);
   const points: MapPointSelectorResult[] = [];
 
-  for (const day of tripPlan.days) {
+  const daysToIterate = activeDayId
+    ? tripPlan.days.filter((day) => day.dayId === activeDayId)
+    : tripPlan.days;
+
+  for (const day of daysToIterate) {
     const usedPlaceIds = new Set<string>();
     for (const item of day.items) {
       if (!item.placeId || usedPlaceIds.has(item.placeId)) {
@@ -108,10 +121,57 @@ export const selectMapPoints = (
         lng: typeof place.lng === "number" ? place.lng : null,
         x: coordinates.x,
         y: coordinates.y,
-        isActive: day.dayId === activeDayId
+        isActive: Boolean(activeDayId) && day.dayId === activeDayId
       });
     }
   }
 
   return points;
 };
+
+export const selectPlaceFocusLegs = (
+  navigationPlan: NavigationPlan | null,
+  selectedPlaceId: string | null
+): {
+  predecessor: {
+    legId: string;
+    fromPlaceId: string;
+    toPlaceId: string;
+    option: RouteOption | null;
+  } | null;
+  successor: {
+    legId: string;
+    fromPlaceId: string;
+    toPlaceId: string;
+    option: RouteOption | null;
+  } | null;
+} => {
+  if (!navigationPlan || !selectedPlaceId) {
+    return { predecessor: null, successor: null };
+  }
+
+  const focusLegs: PlaceFocusLegs = selectLegsForPlace(navigationPlan.legs, selectedPlaceId);
+  return {
+    predecessor: focusLegs.predecessor
+      ? {
+          legId: focusLegs.predecessor.legId,
+          fromPlaceId: focusLegs.predecessor.fromPlaceId,
+          toPlaceId: focusLegs.predecessor.toPlaceId,
+          option: null
+        }
+      : null,
+    successor: focusLegs.successor
+      ? {
+          legId: focusLegs.successor.legId,
+          fromPlaceId: focusLegs.successor.fromPlaceId,
+          toPlaceId: focusLegs.successor.toPlaceId,
+          option: null
+        }
+      : null
+  };
+};
+
+export const selectOptionForLegByStrategy = (
+  options: RouteOption[],
+  strategy: RouteStrategy
+): RouteOption | null => selectOptionByStrategy(options, strategy);

@@ -53,6 +53,23 @@ const createRoutingResult = (mode: "walk" | "transit" | "drive"): RoutingRouteRe
   ]
 });
 
+const createStrategyRoutingResult = (
+  mode: "walk" | "transit" | "drive",
+  strategy: "fastest" | "comfort" | "cheapest"
+): RoutingRouteResult => ({
+  mode,
+  strategy,
+  durationMinutes: strategy === "fastest" ? 14 : strategy === "comfort" ? 22 : 30,
+  distanceKm: 5.5,
+  estimatedCost: strategy === "cheapest" ? 0 : mode === "transit" ? 3 : mode === "drive" ? 8 : 0,
+  comfortScore: strategy === "comfort" ? 9 : 5,
+  geometry: [
+    [135.1, 35.01],
+    [strategy === "comfort" ? 135.13 : 135.12, 35.03],
+    [135.16, 35.06]
+  ]
+});
+
 const createDeps = () => {
   const routingGateway: RoutingGateway = {
     planRoute: vi.fn(async ({ mode }) => createRoutingResult(mode))
@@ -68,9 +85,26 @@ const createDeps = () => {
   };
 };
 
+const createStrategyDeps = () => {
+  const routingGateway: RoutingGateway = {
+    planRoute: vi.fn(async ({ mode, strategy }) =>
+      createStrategyRoutingResult(mode, strategy ?? "fastest")
+    )
+  };
+  const liveCacheRepository: LiveCacheRepository = {
+    getNavigationPlan: vi.fn(async () => null),
+    setNavigationPlan: vi.fn(async () => undefined)
+  };
+
+  return {
+    routingGateway,
+    liveCacheRepository
+  };
+};
+
 describe("createPlanTripRoutes", () => {
-  it("returns route legs with mode options", async () => {
-    const deps = createDeps();
+  it("returns route legs with options tagged by strategy when no strategies/modes specified", async () => {
+    const deps = createStrategyDeps();
     const planTripRoutes = createPlanTripRoutes(deps);
 
     const result = await planTripRoutes({
@@ -82,8 +116,10 @@ describe("createPlanTripRoutes", () => {
     expect(result.ok).toBe(true);
     if (result.ok) {
       expect(result.value.legs).toHaveLength(1);
-      expect(result.value.legs[0]?.options).toHaveLength(3);
-      expect(result.value.legs[0]?.options.some((option) => option.mode === "transit")).toBe(true);
+      const strategies = new Set(result.value.legs[0]?.options.map((o) => o.strategy));
+      expect(strategies.has("fastest")).toBe(true);
+      expect(strategies.has("comfort")).toBe(true);
+      expect(strategies.has("cheapest")).toBe(true);
       expect(result.value.isFallback).toBe(false);
     }
   });
@@ -123,8 +159,8 @@ describe("createPlanTripRoutes", () => {
     }
   });
 
-  it("uses walk-only mode on short legs", async () => {
-    const deps = createDeps();
+  it("uses walk-only mode on short legs but keeps strategy tags", async () => {
+    const deps = createStrategyDeps();
     const planTripRoutes = createPlanTripRoutes(deps);
 
     const shortTrip: TripPlan = {
@@ -144,9 +180,107 @@ describe("createPlanTripRoutes", () => {
     expect(result.ok).toBe(true);
     if (result.ok) {
       expect(result.value.legs).toHaveLength(1);
-      expect(result.value.legs[0]?.options).toHaveLength(1);
-      expect(result.value.legs[0]?.options[0]?.mode).toBe("walk");
-      expect(result.value.legs[0]?.recommendedMode).toBe("walk");
+      const options = result.value.legs[0]?.options ?? [];
+      expect(options.length).toBe(3);
+      expect(options.every((option) => option.mode === "walk")).toBe(true);
     }
+  });
+});
+
+describe("createPlanTripRoutes strategy-aware", () => {
+  it("produces one option per (strategy, mode) pair with strategy tags", async () => {
+    const deps = createStrategyDeps();
+    const planTripRoutes = createPlanTripRoutes(deps);
+
+    const result = await planTripRoutes({
+      tripPlan: sampleTripPlan,
+      dayId: "day-1",
+      departureTime: "2026-07-01T08:00:00.000Z"
+    });
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) {
+      return;
+    }
+
+    const leg = result.value.legs[0];
+    expect(leg).toBeDefined();
+    const strategies = new Set(leg?.options.map((option) => option.strategy));
+    expect(strategies.has("fastest")).toBe(true);
+    expect(strategies.has("comfort")).toBe(true);
+    expect(strategies.has("cheapest")).toBe(true);
+
+    const fastest = leg?.options.find((option) => option.strategy === "fastest");
+    expect(fastest?.durationMinutes).toBeLessThan(
+      leg?.options.find((option) => option.strategy === "comfort")?.durationMinutes ?? Number.POSITIVE_INFINITY
+    );
+  });
+
+  it("uses provided strategies subset when strategies input is given", async () => {
+    const deps = createStrategyDeps();
+    const planTripRoutes = createPlanTripRoutes(deps);
+
+    const result = await planTripRoutes({
+      tripPlan: sampleTripPlan,
+      dayId: "day-1",
+      strategies: ["fastest", "comfort"],
+      departureTime: "2026-07-01T08:00:00.000Z"
+    });
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) {
+      return;
+    }
+
+    const leg = result.value.legs[0];
+    const strategySet = new Set(leg?.options.map((option) => option.strategy));
+    expect(strategySet.has("fastest")).toBe(true);
+    expect(strategySet.has("comfort")).toBe(true);
+    expect(strategySet.has("cheapest")).toBe(false);
+  });
+
+  it("includes strategies in the cache key", async () => {
+    const deps = createStrategyDeps();
+    const planTripRoutes = createPlanTripRoutes(deps);
+
+    await planTripRoutes({
+      tripPlan: sampleTripPlan,
+      dayId: "day-1",
+      strategies: ["fastest"],
+      departureTime: "2026-07-01T08:00:00.000Z"
+    });
+
+    const setCall = (deps.liveCacheRepository.setNavigationPlan as ReturnType<typeof vi.fn>).mock
+      .calls[0];
+    expect(setCall?.[0]).toContain("fastest");
+  });
+
+  it("converges short-distance routes to walk-only but still produces multi-strategy options", async () => {
+    const deps = createStrategyDeps();
+    const planTripRoutes = createPlanTripRoutes(deps);
+
+    const shortTrip: TripPlan = {
+      ...sampleTripPlan,
+      places: {
+        p1: { placeId: "p1", name: "A", lat: 35.01, lng: 135.1 },
+        p2: { placeId: "p2", name: "B", lat: 35.0104, lng: 135.1005 }
+      }
+    };
+
+    const result = await planTripRoutes({
+      tripPlan: shortTrip,
+      dayId: "day-1",
+      strategies: ["fastest", "comfort", "cheapest"],
+      departureTime: "2026-07-01T08:00:00.000Z"
+    });
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) {
+      return;
+    }
+
+    const options = result.value.legs[0]?.options ?? [];
+    expect(options.length).toBe(3);
+    expect(options.every((option) => option.mode === "walk")).toBe(true);
   });
 });

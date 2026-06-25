@@ -11,20 +11,40 @@
       "date": "2026-04-10",
       "dayIndex": 1,
       "city": "Osaka",
-      "summary": "到达与城市漫步",
+      "summary": "到达与大阪城区漫步",
       "items": [
         {
           "itemId": "item-1-1",
           "title": "酒店办理入住",
-          "content": "到达酒店后寄存行李并确认次日早餐时间。",
-          "placeId": "place-hotel",
-          "startTime": "14:00",
-          "endTime": "14:40",
+          "content": "到达难波附近酒店后寄存行李并确认次日早餐时间。",
+          "placeId": "place-hotel-namba",
+          "startTime": "13:00",
+          "endTime": "13:40",
           "durationMinutes": 40,
           "category": "hotel"
         },
         {
           "itemId": "item-1-2",
+          "title": "大阪城公园漫步",
+          "content": "前往天守阁方向，控制步行节奏并预留拍照时间。",
+          "placeId": "place-osaka-castle",
+          "startTime": "14:30",
+          "endTime": "16:30",
+          "durationMinutes": 120,
+          "category": "sightseeing"
+        },
+        {
+          "itemId": "item-1-3",
+          "title": "黑门市场午餐",
+          "content": "尝试章鱼烧与刺身，注意高峰排队约 15 分钟。",
+          "placeId": "place-kuromon",
+          "startTime": "17:00",
+          "endTime": "18:00",
+          "durationMinutes": 60,
+          "category": "food"
+        },
+        {
+          "itemId": "item-1-4",
           "title": "道顿堀夜间漫步",
           "content": "体验夜景与街头美食，控制步行节奏。",
           "placeId": "place-dotonbori",
@@ -40,6 +60,12 @@
           "title": "便携雨具",
           "level": "should",
           "note": "春季可能短时降雨。"
+        },
+        {
+          "id": "prep-2",
+          "title": "充电宝",
+          "level": "must",
+          "note": "全天多地点拍照电量消耗较大。"
         }
       ]
     },
@@ -48,12 +74,12 @@
       "date": "2026-04-11",
       "dayIndex": 2,
       "city": "Kyoto",
-      "summary": "寺社与古街体验",
+      "summary": "京都寺社与古街体验",
       "items": [
         {
           "itemId": "item-2-1",
-          "title": "伏见稻荷参观",
-          "content": "清晨参观，避开高峰时段。",
+          "title": "伏见稻荷大社参观",
+          "content": "清晨进入千本鸟居，避开高峰时段。",
           "placeId": "place-fushimi-inari",
           "startTime": "08:00",
           "endTime": "10:00",
@@ -62,13 +88,41 @@
         },
         {
           "itemId": "item-2-2",
-          "title": "祇园步行",
-          "content": "午后散步并进行拍照打卡。",
+          "title": "清水寺午餐与参观",
+          "content": "沿途饼干与抹茶体验，控制在寺内 90 分钟。",
+          "placeId": "place-kiyomizu",
+          "startTime": "11:00",
+          "endTime": "13:00",
+          "durationMinutes": 120,
+          "category": "sightseeing"
+        },
+        {
+          "itemId": "item-2-3",
+          "title": "祇园古街步行",
+          "content": "午后散步并进行拍照打卡，留意艺伎通道礼仪。",
           "placeId": "place-gion",
-          "startTime": "14:00",
-          "endTime": "15:30",
+          "startTime": "14:30",
+          "endTime": "16:00",
           "durationMinutes": 90,
           "category": "free"
+        },
+        {
+          "itemId": "item-2-4",
+          "title": "锦市场晚餐前小食",
+          "content": "尝试几个京都特色小吃，控制预算。",
+          "placeId": "place-nishiki",
+          "startTime": "17:00",
+          "endTime": "18:30",
+          "durationMinutes": 90,
+          "category": "food"
+        }
+      ],
+      "preparations": [
+        {
+          "id": "prep-3",
+          "title": "舒适步行鞋",
+          "level": "must",
+          "note": "全天步行距离较长。"
         }
       ],
       "suggestions": [
@@ -85,17 +139,47 @@
       "date": "2026-04-12",
       "dayIndex": 3,
       "city": "Osaka",
-      "summary": "返程准备",
+      "summary": "大阪梅田与海湾区",
       "items": [
         {
           "itemId": "item-3-1",
-          "title": "退房与前往机场",
-          "content": "确认护照与证件，预留交通缓冲时间。",
-          "placeId": "place-kix",
-          "startTime": "10:30",
-          "endTime": "12:00",
+          "title": "梅田空中庭园展望台",
+          "content": "上午视野最佳，建议预留拍照时间。",
+          "placeId": "place-umeda-sky",
+          "startTime": "09:30",
+          "endTime": "11:00",
           "durationMinutes": 90,
-          "category": "transport"
+          "category": "sightseeing"
+        },
+        {
+          "itemId": "item-3-2",
+          "title": "梅田商圈购物",
+          "content": "记录停留时间，避免与其他活动冲突。",
+          "placeId": "place-umeda",
+          "startTime": "11:30",
+          "endTime": "13:00",
+          "durationMinutes": 90,
+          "category": "free"
+        },
+        {
+          "itemId": "item-3-3",
+          "title": "天保山港湾村",
+          "content": "下午参观摩天轮与海游馆前置空间。",
+          "placeId": "place-tempozan",
+          "startTime": "14:30",
+          "endTime": "16:30",
+          "durationMinutes": 120,
+          "category": "sightseeing"
+        },
+        {
+          "itemId": "item-3-4",
+          "title": "港口海景晚餐",
+          "content": "选择靠窗位置避开结束前的客流。",
+          "placeId": "place-kobe-harbor",
+          "startTime": "18:00",
+          "endTime": "19:30",
+          "durationMinutes": 90,
+          "category": "food"
         }
       ]
     },
@@ -104,7 +188,7 @@
       "date": "2026-04-13",
       "dayIndex": 4,
       "city": "Nara",
-      "summary": "古都漫游",
+      "summary": "奈良古都漫游",
       "items": [
         {
           "itemId": "item-4-1",
@@ -119,12 +203,32 @@
         {
           "itemId": "item-4-2",
           "title": "东大寺参观",
-          "content": "参观大佛殿，注意参观动线。",
+          "content": "参观大佛殿，注意参观动线与拍照限制。",
           "placeId": "place-todai-ji",
           "startTime": "10:30",
           "endTime": "12:00",
           "durationMinutes": 90,
           "category": "sightseeing"
+        },
+        {
+          "itemId": "item-4-3",
+          "title": "春日大社参道",
+          "content": "沿石灯参道漫步，留意保持通道畅通。",
+          "placeId": "place-kasuga",
+          "startTime": "13:30",
+          "endTime": "15:00",
+          "durationMinutes": 90,
+          "category": "sightseeing"
+        },
+        {
+          "itemId": "item-4-4",
+          "title": "奈良老街茶屋",
+          "content": "尝试釜饭与抹茶小点。",
+          "placeId": "place-nara-oldtown",
+          "startTime": "15:30",
+          "endTime": "16:30",
+          "durationMinutes": 60,
+          "category": "food"
         }
       ]
     },
@@ -133,12 +237,12 @@
       "date": "2026-04-14",
       "dayIndex": 5,
       "city": "Kobe",
-      "summary": "港口与美食",
+      "summary": "神户港口与美食",
       "items": [
         {
           "itemId": "item-5-1",
           "title": "北野异人馆街",
-          "content": "沿坡道参观异人馆建筑群。",
+          "content": "沿坡道参观异人馆建筑群，留意票务窗口。",
           "placeId": "place-kitano",
           "startTime": "09:30",
           "endTime": "11:00",
@@ -147,13 +251,33 @@
         },
         {
           "itemId": "item-5-2",
+          "title": "南京町午餐",
+          "content": "排队时间约 20 分钟，提前预留弹性。",
+          "placeId": "place-nankinmachi",
+          "startTime": "11:30",
+          "endTime": "13:00",
+          "durationMinutes": 90,
+          "category": "food"
+        },
+        {
+          "itemId": "item-5-3",
           "title": "神户港海边步道",
           "content": "下午安排海边慢行与休息。",
           "placeId": "place-kobe-harbor",
-          "startTime": "15:00",
-          "endTime": "16:30",
+          "startTime": "14:30",
+          "endTime": "16:00",
           "durationMinutes": 90,
           "category": "free"
+        },
+        {
+          "itemId": "item-5-4",
+          "title": "神户牛排晚餐",
+          "content": "提前预订，注意结束时间与返程交通。",
+          "placeId": "place-kobe-steak",
+          "startTime": "18:00",
+          "endTime": "19:30",
+          "durationMinutes": 90,
+          "category": "food"
         }
       ]
     },
@@ -162,7 +286,7 @@
       "date": "2026-04-15",
       "dayIndex": 6,
       "city": "Kyoto",
-      "summary": "岚山一日",
+      "summary": "岚山一日深度",
       "items": [
         {
           "itemId": "item-6-1",
@@ -183,6 +307,26 @@
           "endTime": "11:20",
           "durationMinutes": 80,
           "category": "free"
+        },
+        {
+          "itemId": "item-6-3",
+          "title": "天龙寺庭园",
+          "content": "禅意庭园静观，避免喧哗。",
+          "placeId": "place-tenryuji",
+          "startTime": "12:30",
+          "endTime": "14:00",
+          "durationMinutes": 90,
+          "category": "sightseeing"
+        },
+        {
+          "itemId": "item-6-4",
+          "title": "岚电沿街咖啡",
+          "content": "小憩并复盘当日照片。",
+          "placeId": "place-arashiyama-cafe",
+          "startTime": "15:00",
+          "endTime": "16:00",
+          "durationMinutes": 60,
+          "category": "free"
         }
       ]
     },
@@ -195,21 +339,41 @@
       "items": [
         {
           "itemId": "item-7-1",
-          "title": "梅田最后采购",
+          "title": "难波商圈最后采购",
           "content": "控制时间并提前整理行李。",
-          "placeId": "place-umeda",
-          "startTime": "09:30",
-          "endTime": "11:00",
+          "placeId": "place-namba-shops",
+          "startTime": "09:00",
+          "endTime": "10:30",
           "durationMinutes": 90,
           "category": "free"
         },
         {
           "itemId": "item-7-2",
-          "title": "前往机场办理值机",
+          "title": "梅田最后采购",
+          "content": "若时间允许可顺便取货。",
+          "placeId": "place-umeda",
+          "startTime": "11:00",
+          "endTime": "12:30",
+          "durationMinutes": 90,
+          "category": "free"
+        },
+        {
+          "itemId": "item-7-3",
+          "title": "酒店退房",
+          "content": "确认是否有遗漏物品并寄存行李。",
+          "placeId": "place-hotel-namba",
+          "startTime": "13:00",
+          "endTime": "13:30",
+          "durationMinutes": 30,
+          "category": "hotel"
+        },
+        {
+          "itemId": "item-7-4",
+          "title": "前往关西机场办理值机",
           "content": "预留交通与安检时间。",
           "placeId": "place-kix",
-          "startTime": "13:30",
-          "endTime": "15:00",
+          "startTime": "14:30",
+          "endTime": "16:00",
           "durationMinutes": 90,
           "category": "transport"
         }
@@ -217,13 +381,32 @@
     }
   ],
   "places": {
-    "place-hotel": {
-      "placeId": "place-hotel",
+    "place-hotel-namba": {
+      "placeId": "place-hotel-namba",
       "name": "难波站附近酒店",
-      "address": "Namba, Osaka",
+      "address": "Namba, Chuo Ward, Osaka",
       "lat": 34.6665,
       "lng": 135.5019,
-      "highlights": ["交通便利", "可步行到餐饮区"]
+      "highlights": ["交通便利", "可步行到餐饮区"],
+      "tips": ["提前确认早餐时间", "寄存行李可索取号码牌"]
+    },
+    "place-osaka-castle": {
+      "placeId": "place-osaka-castle",
+      "name": "大阪城公园",
+      "address": "Chuo Ward, Osaka",
+      "lat": 34.6873,
+      "lng": 135.5258,
+      "highlights": ["樱花季", "天守阁视野"],
+      "tips": ["建议从大手门进入"]
+    },
+    "place-kuromon": {
+      "placeId": "place-kuromon",
+      "name": "黑门市场",
+      "address": "Chuo Ward, Osaka",
+      "lat": 34.6703,
+      "lng": 135.5062,
+      "highlights": ["本地小吃", "海鲜刺身"],
+      "tips": ["高峰时段需排队约 15 分钟"]
     },
     "place-dotonbori": {
       "placeId": "place-dotonbori",
@@ -231,7 +414,8 @@
       "address": "Chuo Ward, Osaka",
       "lat": 34.6687,
       "lng": 135.5013,
-      "highlights": ["夜景", "街头美食"]
+      "highlights": ["夜景", "街头美食", "招牌打卡"],
+      "tips": ["夜晚拍照注意人流", "夜晚人流密集"]
     },
     "place-fushimi-inari": {
       "placeId": "place-fushimi-inari",
@@ -239,7 +423,17 @@
       "address": "Fushimi Ward, Kyoto",
       "lat": 34.9671,
       "lng": 135.7727,
-      "highlights": ["千本鸟居"]
+      "highlights": ["千本鸟居", "清晨光线"],
+      "tips": ["早上 8 点前进入人少", "上山全程约 2 小时"]
+    },
+    "place-kiyomizu": {
+      "placeId": "place-kiyomizu",
+      "name": "清水寺",
+      "address": "Higashiyama Ward, Kyoto",
+      "lat": 34.9949,
+      "lng": 135.7851,
+      "highlights": ["木结构舞台", "音羽瀑布"],
+      "tips": ["参道较陡穿舒适鞋"]
     },
     "place-gion": {
       "placeId": "place-gion",
@@ -247,63 +441,26 @@
       "address": "Higashiyama Ward, Kyoto",
       "lat": 35.0037,
       "lng": 135.7788,
-      "highlights": ["古街氛围"]
+      "highlights": ["古街氛围", "茶屋与艺伎通道"],
+      "tips": ["拍照需保持通道礼仪"]
     },
-    "place-kix": {
-      "placeId": "place-kix",
-      "name": "关西国际机场",
-      "address": "Kansai Airport, Osaka",
-      "lat": 34.4342,
-      "lng": 135.2441,
-      "highlights": ["国际航线", "交通换乘"]
+    "place-nishiki": {
+      "placeId": "place-nishiki",
+      "name": "锦市场",
+      "address": "Nakagyo Ward, Kyoto",
+      "lat": 35.005,
+      "lng": 135.7649,
+      "highlights": ["京都小食", "传统店铺"],
+      "tips": ["市场在傍晚陆续打烊"]
     },
-    "place-nara-park": {
-      "placeId": "place-nara-park",
-      "name": "奈良公园",
-      "address": "Nara Park, Nara",
-      "lat": 34.6851,
-      "lng": 135.843,
-      "highlights": ["开放草地", "步行友好"]
-    },
-    "place-todai-ji": {
-      "placeId": "place-todai-ji",
-      "name": "东大寺",
-      "address": "Zoshicho, Nara",
-      "lat": 34.6891,
-      "lng": 135.8398,
-      "highlights": ["大佛殿", "历史建筑"]
-    },
-    "place-kitano": {
-      "placeId": "place-kitano",
-      "name": "北野异人馆街",
-      "address": "Kitanocho, Kobe",
-      "lat": 34.7019,
-      "lng": 135.1919,
-      "highlights": ["坡地街区", "异国建筑"]
-    },
-    "place-kobe-harbor": {
-      "placeId": "place-kobe-harbor",
-      "name": "神户港",
-      "address": "Harborland, Kobe",
-      "lat": 34.6826,
-      "lng": 135.1868,
-      "highlights": ["海滨步道", "港口夜景"]
-    },
-    "place-arashiyama": {
-      "placeId": "place-arashiyama",
-      "name": "岚山竹林",
-      "address": "Ukyo Ward, Kyoto",
-      "lat": 35.017,
-      "lng": 135.6713,
-      "highlights": ["竹林小径", "清晨光线"]
-    },
-    "place-togetsu": {
-      "placeId": "place-togetsu",
-      "name": "渡月桥",
-      "address": "Arashiyama, Kyoto",
-      "lat": 35.0159,
-      "lng": 135.6761,
-      "highlights": ["河景", "桥区漫步"]
+    "place-umeda-sky": {
+      "placeId": "place-umeda-sky",
+      "name": "梅田空中庭园展望台",
+      "address": "Kita Ward, Osaka",
+      "lat": 34.7053,
+      "lng": 135.491,
+      "highlights": ["360 度城市视野", "黄昏时段"],
+      "tips": ["黄昏时段拍照最佳"]
     },
     "place-umeda": {
       "placeId": "place-umeda",
@@ -311,7 +468,143 @@
       "address": "Kita Ward, Osaka",
       "lat": 34.7025,
       "lng": 135.4959,
-      "highlights": ["购物便利", "交通枢纽"]
+      "highlights": ["购物便利", "交通枢纽"],
+      "tips": ["注意店内时段以免闭店"]
+    },
+    "place-tempozan": {
+      "placeId": "place-tempozan",
+      "name": "天保山港湾村",
+      "address": "Minato Ward, Osaka",
+      "lat": 34.6547,
+      "lng": 135.4289,
+      "highlights": ["摩天轮", "海游馆前广场"],
+      "tips": ["海游馆需提前预留 1 小时"]
+    },
+    "place-kobe-harbor": {
+      "placeId": "place-kobe-harbor",
+      "name": "神户港",
+      "address": "Harborland, Kobe",
+      "lat": 34.6826,
+      "lng": 135.1868,
+      "highlights": ["海滨步道", "港口夜景", "晚餐推荐"],
+      "tips": ["海风较大可备外套"]
+    },
+    "place-nara-park": {
+      "placeId": "place-nara-park",
+      "name": "奈良公园",
+      "address": "Nara Park, Nara",
+      "lat": 34.6851,
+      "lng": 135.843,
+      "highlights": ["开放草地", "步行友好", "野生鹿群"],
+      "tips": ["上午鹿群活跃但注意喂食礼仪"]
+    },
+    "place-todai-ji": {
+      "placeId": "place-todai-ji",
+      "name": "东大寺",
+      "address": "Zoshicho, Nara",
+      "lat": 34.6891,
+      "lng": 135.8398,
+      "highlights": ["大佛殿", "历史建筑"],
+      "tips": ["大佛殿内拍照有区域限制"]
+    },
+    "place-kasuga": {
+      "placeId": "place-kasuga",
+      "name": "春日大社",
+      "address": "Takabatakecho, Nara",
+      "lat": 34.6814,
+      "lng": 135.8484,
+      "highlights": ["石灯参道", "神社氛围"],
+      "tips": ["参道保持安静以尊重参拜礼仪"]
+    },
+    "place-nara-oldtown": {
+      "placeId": "place-nara-oldtown",
+      "name": "奈良老街茶屋",
+      "address": "Nara Sanjo-dori, Nara",
+      "lat": 34.6856,
+      "lng": 135.8113,
+      "highlights": ["釜饭", "抹茶小点"],
+      "tips": ["餐点现做需等候约 15 分钟"]
+    },
+    "place-kitano": {
+      "placeId": "place-kitano",
+      "name": "北野异人馆街",
+      "address": "Kitanocho, Kobe",
+      "lat": 34.7019,
+      "lng": 135.1919,
+      "highlights": ["坡地街区", "异国建筑"],
+      "tips": ["坡道较多鞋底防滑"]
+    },
+    "place-nankinmachi": {
+      "placeId": "place-nankinmachi",
+      "name": "南京町",
+      "address": "Chuo Ward, Kobe",
+      "lat": 34.6893,
+      "lng": 135.1808,
+      "highlights": ["中华料理", "街边小吃"],
+      "tips": ["午餐高峰排队约 20 分钟"]
+    },
+    "place-kobe-steak": {
+      "placeId": "place-kobe-steak",
+      "name": "神户牛排餐厅",
+      "address": "Chuo Ward, Kobe",
+      "lat": 34.6934,
+      "lng": 135.1832,
+      "highlights": ["神户牛", "铁板现场烹饪"],
+      "tips": ["建议提前预约"]
+    },
+    "place-arashiyama": {
+      "placeId": "place-arashiyama",
+      "name": "岚山竹林",
+      "address": "Ukyo Ward, Kyoto",
+      "lat": 35.017,
+      "lng": 135.6713,
+      "highlights": ["竹林小径", "清晨光线"],
+      "tips": ["清晨 8 点前人少"]
+    },
+    "place-togetsu": {
+      "placeId": "place-togetsu",
+      "name": "渡月桥",
+      "address": "Arashiyama, Kyoto",
+      "lat": 35.0159,
+      "lng": 135.6761,
+      "highlights": ["河景", "桥区漫步"],
+      "tips": ["桥两侧观景位拍照人数较多"]
+    },
+    "place-tenryuji": {
+      "placeId": "place-tenryuji",
+      "name": "天龙寺",
+      "address": "Sogano-cho, Kyoto",
+      "lat": 35.0163,
+      "lng": 135.6726,
+      "highlights": ["禅意庭园", "曹源池"],
+      "tips": ["庭园内保持安静"]
+    },
+    "place-arashiyama-cafe": {
+      "placeId": "place-arashiyama-cafe",
+      "name": "岚电沿街咖啡",
+      "address": "Arashiyama Randen, Kyoto",
+      "lat": 35.0142,
+      "lng": 135.67,
+      "highlights": ["安静角落", "下午茶"],
+      "tips": ["靠窗位下午易满"]
+    },
+    "place-namba-shops": {
+      "placeId": "place-namba-shops",
+      "name": "难波商圈",
+      "address": "Namba, Chuo Ward, Osaka",
+      "lat": 34.6634,
+      "lng": 135.5017,
+      "highlights": ["伴手礼", "药妆"],
+      "tips": ["部分店铺上午 11 点才开门"]
+    },
+    "place-kix": {
+      "placeId": "place-kix",
+      "name": "关西国际机场",
+      "address": "Kansai Airport, Osaka",
+      "lat": 34.4342,
+      "lng": 135.2441,
+      "highlights": ["国际航线", "交通换乘"],
+      "tips": ["建议航班起飞前 2.5 小时到达"]
     }
   },
   "globalPreparations": [
@@ -320,6 +613,18 @@
       "title": "轻便鞋",
       "level": "must",
       "note": "连续步行场景较多。"
+    },
+    {
+      "id": "prep-global-2",
+      "title": "IC 交通卡充值",
+      "level": "should",
+      "note": "覆盖关西多城通勤。"
+    },
+    {
+      "id": "prep-global-3",
+      "title": "便携雨具",
+      "level": "should",
+      "note": "春季可能短时降雨。"
     }
   ],
   "globalSuggestions": [
@@ -327,6 +632,18 @@
       "id": "sug-global-1",
       "type": "budget",
       "content": "餐饮和交通预算按日预留 10% 弹性。",
+      "priority": "medium"
+    },
+    {
+      "id": "sug-global-2",
+      "type": "timing",
+      "content": "热门景点优先安排在上午，避免高峰人流。",
+      "priority": "high"
+    },
+    {
+      "id": "sug-global-3",
+      "type": "route",
+      "content": "跨城移动建议使用特急列车，预留 30 分钟缓冲。",
       "priority": "medium"
     }
   ]
