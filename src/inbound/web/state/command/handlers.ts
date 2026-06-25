@@ -2,13 +2,34 @@ import type { LoadTripPlan } from "../../../../features/load-trip-plan/port";
 import type { PlanTripRoutes } from "../../../../features/plan-trip-routes/port";
 import type { ShowDayDecisionHints } from "../../../../features/show-day-decision-hints/port";
 import type { SwitchCurrentDay } from "../../../../features/switch-current-day/port";
-import type { NavigationPlan } from "../../../../domains/trip-navigation/route-plan";
+import type { NavigationPlan, DayDecisionHints } from "../../../../domains/trip-navigation/route-plan";
+import type { TripPlan } from "../../../../domains/trip-planning/trip-plan";
+import type { TravelMode } from "../../../../domains/trip-navigation/route-plan";
 import type { TripUiCommandBus } from "../../events";
-import { useTripViewStore } from "../store/view-store";
+import { tripCommands } from "./commands";
 import { TRIP_UI_COMMANDS } from "./events";
+
+export type TripViewStoreApi = {
+  getState: () => {
+    tripPlan: TripPlan | null;
+    currentDayId: string | null;
+    selectedTravelMode: TravelMode;
+    loadStarted: () => void;
+    loadSucceeded: (tripPlan: TripPlan, currentDayId: string) => void;
+    loadFailed: (message: string) => void;
+    daySwitchSucceeded: (currentDayId: string) => void;
+    daySwitchFailed: (message: string) => void;
+    travelModeSelected: (mode: TravelMode) => void;
+    navigationPlanSucceeded: (navigationPlan: NavigationPlan | null) => void;
+    navigationPlanFailed: (message: string) => void;
+    decisionHintsSucceeded: (hints: DayDecisionHints | null) => void;
+    decisionHintsFailed: (message: string) => void;
+  };
+};
 
 type TripModelHandlerDependencies = {
   commandBus: TripUiCommandBus;
+  store: TripViewStoreApi;
   loadTripPlan: LoadTripPlan;
   switchCurrentDay: SwitchCurrentDay;
   planTripRoutes: PlanTripRoutes;
@@ -22,7 +43,7 @@ export const registerTripModelHandlers = (
     dayId: string;
     navigationPlan: NavigationPlan;
   }) => {
-    const state = useTripViewStore.getState();
+    const state = deps.store.getState();
     if (!state.tripPlan) {
       return;
     }
@@ -43,7 +64,7 @@ export const registerTripModelHandlers = (
   };
 
   const stopPageOpened = deps.commandBus.on(TRIP_UI_COMMANDS.pageOpened, async (command) => {
-    const state = useTripViewStore.getState();
+    const state = deps.store.getState();
     state.loadStarted();
 
     const result = await deps.loadTripPlan({ tripId: command.tripId });
@@ -73,13 +94,13 @@ export const registerTripModelHandlers = (
   const handleSwitchDay = async (dayId: string) => {
     const result = await deps.switchCurrentDay({ dayId });
     if (!result.ok) {
-      useTripViewStore.getState().daySwitchFailed(result.error.message);
+      deps.store.getState().daySwitchFailed(result.error.message);
       return;
     }
 
-    useTripViewStore.getState().daySwitchSucceeded(result.value.currentDayId);
+    const state = deps.store.getState();
+    state.daySwitchSucceeded(result.value.currentDayId);
 
-    const state = useTripViewStore.getState();
     if (!state.tripPlan) {
       return;
     }
@@ -113,7 +134,7 @@ export const registerTripModelHandlers = (
   const stopTravelModeSelected = deps.commandBus.on(
     TRIP_UI_COMMANDS.travelModeSelected,
     async (command) => {
-      const state = useTripViewStore.getState();
+      const state = deps.store.getState();
       state.travelModeSelected(command.mode);
       if (!state.tripPlan || !state.currentDayId) {
         return;
@@ -145,3 +166,5 @@ export const registerTripModelHandlers = (
     stopTravelModeSelected();
   };
 };
+
+export { tripCommands };

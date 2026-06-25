@@ -1,41 +1,29 @@
 ---
 name: xp-validation
-description: 校验 DDD + 六边形架构的依赖方向与边界纯度，以及 XP/TDD 测试实践。当生成或修改 src/ 代码后、合并前，或需要把架构规则落为 CI / pre-commit 检查时使用。
+description: 校验架构依赖方向与边界纯度、TDD 测试实践。当生成或修改 src/ 代码后、合并前，或需要把架构规则落为 CI / pre-commit 检查时使用。
 ---
 
 # Skill: XP 校验（架构适应度函数）
 
-> 用途：把 DDD + 六边形的架构规则与 XP/TDD 实践变成**可执行规约**，防止迭代中架构腐化。
+> 用途：把架构规则变成**可执行规约**，防止迭代中架构腐化。
 > 何时用：生成 / 修改 `src/` 代码后、合并前；以及 CI 与本地 pre-commit。
+> 规则唯一描述源：[`.human/architecture.md`](../../.human/architecture.md) 的 ARCH-R1~R6、DDD 战术约束、测试与验证。本文件只描述如何校验，不重述规则。
 
 ---
 
-## 校验项（铁律）
+## 校验项 → 对应规则（查 `.human/architecture.md`）
 
-### 1. 依赖方向（六边形）
-- `domains/` **零出边**：无任何 import。
-- `features/` 只依赖 `domains/` 与自身 ports；禁止 import `inbound/`、`outbound/`、`bootstrap/`。
-- `inbound/` 只依赖 feature 的 inbound port；禁止 import `outbound/`。
-- `outbound/` 只实现 feature 的 outbound port；禁止 import `inbound/`。
-- `domains/` 禁止依赖 `features/`、`inbound/`、`outbound/`、`bootstrap/`。
-- `bootstrap/` 可依赖全部，但不含业务逻辑 / 用例流程。
-
-### 2. 边界纯度
-- `domains/` 内禁止出现 I/O / SQL / HTTP / 框架 / SDK 的 import。
-- `shared/` 内禁止出现领域概念（业务词汇）——保持业务中立。
-- 所有 port 定义在 `features/`，不在 `domains/`。
-- `features/` 内 use case 实现 MUST NOT 使用 class；统一使用函数/函数工厂。
-
-### 3. 测试（XP / TDD）
-- 每个 `domain` 规则有单元测试（无需 mock）。
-- 每个 `feature` 用例有测试（mock outbound ports）。
-- 红 → 绿 → 重构：先写失败测试，再实现。
+| 校验项 | 规则来源 | 脚本实现 |
+|--------|----------|----------|
+| 依赖方向 | ARCH-R1~R4 | `scripts/check-architecture` |
+| 边界纯度（domains 无 I/O、shared 无业务词、ports 在 features、use case 无 class） | ARCH-R1,R2,R6 | `scripts/check-architecture` |
+| 测试存在（domain 有单元测试、feature 有用例测试） | 测试与验证 | 检查 `tests/domains/` 与 `tests/features/` 覆盖 |
 
 ---
 
-## 如何落地（语言无关，按生态选工具）
+## 如何落地
 
-把规则实现为脚本，放 `scripts/`（当前入口：`scripts/check-architecture`），接入 CI 与 pre-commit：
+脚本已放在 `scripts/`（当前入口：`scripts/check-architecture`），接入 CI 与 pre-commit。
 
 | 生态 | 依赖校验 | 测试 |
 |------|----------|------|
@@ -45,11 +33,9 @@ description: 校验 DDD + 六边形架构的依赖方向与边界纯度，以及
 | Go | go-arch-lint | go test |
 | Rust | cargo-modules · 自定义 lint | cargo test |
 
-> 规则的唯一描述源是本文件；脚本只是它的可执行实现。规则有变，先改这里。
-
 ---
 
 ## 输出约定
 
 - **通过** → 允许合并。
-- **失败** → 列出违规的文件与触发的规则编号，按 `.ai/agent.md` §2 的"逻辑归属口诀"修正后重跑。
+- **失败** → 列出违规的文件与触发的规则编号，按 `.ai/agent.md` 门禁修正后重跑。

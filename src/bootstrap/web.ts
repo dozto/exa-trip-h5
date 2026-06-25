@@ -7,6 +7,7 @@ import { switchCurrentDay } from "../features/switch-current-day";
 import { createTripUiCommandBus } from "../inbound/web/events";
 import type { TripModelRuntime } from "../inbound/web/state/store/runtime-context";
 import { registerTripModelHandlers } from "../inbound/web/state/command/handlers";
+import { useTripViewStore } from "../inbound/web/state/store/view-store";
 import { MapboxRoutingGateway } from "../outbound/gateways/mapbox-routing.gateway";
 import { MockRoutingGateway } from "../outbound/gateways/mock-routing.gateway";
 import { InMemoryLiveCacheRepository } from "../outbound/repositories/in-memory-live-cache.repository";
@@ -37,6 +38,7 @@ export const bootstrapWebApp = (): TripModelRuntime => {
 
   const stopHandlers = registerTripModelHandlers({
     commandBus,
+    store: useTripViewStore,
     loadTripPlan,
     switchCurrentDay,
     planTripRoutes,

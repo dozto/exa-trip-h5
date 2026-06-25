@@ -1,6 +1,5 @@
 import { Button } from "@heroui/react";
-
-type TravelMode = "walk" | "transit" | "drive";
+import type { TravelMode } from "../../../domains/trip-navigation/route-plan";
 
 type MapToolbarProps = {
   disabled: boolean;

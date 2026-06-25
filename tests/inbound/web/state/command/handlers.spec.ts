@@ -89,6 +89,7 @@ describe("registerTripModelHandlers", () => {
 
     const stop = registerTripModelHandlers({
       commandBus,
+      store: useTripViewStore,
       loadTripPlan,
       switchCurrentDay,
       planTripRoutes,
@@ -134,6 +135,7 @@ describe("registerTripModelHandlers", () => {
 
     const stop = registerTripModelHandlers({
       commandBus,
+      store: useTripViewStore,
       loadTripPlan,
       switchCurrentDay,
       planTripRoutes,
@@ -163,7 +165,7 @@ describe("registerTripModelHandlers", () => {
     const switchCurrentDay = vi.fn(async () => ({
       ok: false as const,
       error: {
-        code: "trip_load_failed" as const,
+        code: "day_switch_failed" as const,
         message: "switch failed"
       }
     }));
@@ -172,6 +174,7 @@ describe("registerTripModelHandlers", () => {
 
     const stop = registerTripModelHandlers({
       commandBus,
+      store: useTripViewStore,
       loadTripPlan,
       switchCurrentDay,
       planTripRoutes,
@@ -214,6 +217,7 @@ describe("registerTripModelHandlers", () => {
 
     const stop = registerTripModelHandlers({
       commandBus,
+      store: useTripViewStore,
       loadTripPlan,
       switchCurrentDay,
       planTripRoutes,

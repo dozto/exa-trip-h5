@@ -1,6 +1,7 @@
 import { Chip } from "@heroui/react";
 import mapboxgl from "mapbox-gl";
 import { useEffect, useMemo, useRef } from "react";
+import type { TravelMode } from "../../../domains/trip-navigation/route-plan";
 import type { TripMapViewModel } from "../state/state/view-model";
 import { MapToolbar } from "./map-toolbar";
 
@@ -35,7 +36,7 @@ type MapCanvasProps = {
   isLoading: boolean;
   reduceMotion: boolean;
   onSelectPoint: (dayId: string) => void;
-  onSelectTravelMode: (mode: "walk" | "transit" | "drive") => void;
+  onSelectTravelMode: (mode: TravelMode) => void;
   onSelectHintActivity: (activityId: string) => void;
 };
 

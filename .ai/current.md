@@ -9,6 +9,19 @@
 - Mapbox 实时能力文档已收口（见 [RFC-0002](./rfcs/RFC-0002-mapbox-live-navigation.md)，状态 `accepted`）。
 - 实时能力已形成双 feature：`plan-trip-routes`（路线预估）+ `show-day-decision-hints`（事件预估与衔接可行性），并由 `view-itinerary` 聚合编排（见 [RFC-0003](./rfcs/RFC-0003-decision-hints-and-view-orchestration.md)）。
 - 最近 tiny-change：`.env` 纳入 gitignore 并补 `.env.example`；移除未接入的 `bootstrap/node.ts`，Mapbox 接入收敛为前端公开 token 直连单模式；统一领域术语 `RoutePlan` → `NavigationPlan`（见 `.ai/rfcs/tiny-change-2026-06-25-cleanup-and-terminology.md`）。
+- 最近变更（文档与代码质量优化）：
+  - 文档结构收敛：`.human/ddd-principles.md` 与 `.human/hexagonal-principles.md` 合并进 `.human/architecture.md`；`.skills/feature-delivery` 删除（流程统一由 `.ai/workflow-feature-delivery.md` 承载）；技能文件去除规则重述仅保留可执行部分。
+  - `check-doc-sync` 启发式收紧：仅 `src/domains`、`src/features`、`src/inbound/web/state/command` 变更才要求 RFC/tiny-change 记录。
+  - 领域方法补齐单元测试：`tests/domains/trip-planning/`（17 tests）、`tests/domains/trip-navigation/`（21 tests）。
+  - `assertPlanInvariants` 已在 `load-trip-plan` 中于 Zod 校验后调用，消除死代码。
+  - 重复代码提取到 `shared/`：`parseTimeToMinutes`、`formatMinutesToTime`（`shared/time.ts`）、`haversineDistanceKm`（`shared/geo.ts`）。inbound 层全部改用 domain `TravelMode` 类型。
+  - 错误码新增 `day_switch_failed`，`switch-current-day`不再复用 `trip_load_failed`。
+  - `handlers.ts` 不再直接 import Zustand singleton，`store` 作为依赖注入。
+- 最近变更（流程与约束强化）：
+  - 新增 Definition of Ready（DoR）：`.ai/workflow-feature-delivery.md` §0.3，定义 AI 启动前输入就绪判定标准。
+  - 新增 `.human/README.md`：人类使用元指引，文件职责表 + 参与时机 + 启动条件。`AGENTS.md` 入口链接已更新指向。
+  - `architecture.md` 测试约定具体化：测试组织（镜像 src）、命名（`*.spec.ts`）、覆盖范围（domain 100%、feature 主路径+失败路径）、Mock 策略（mock port interface、不 mock domain）。
+  - `architecture.md` ADR 触发清单明化：6 类偏离必须写 ADR（限界上下文边界变化、依赖方向口径变化、核心框架替换、跨聚合事务、domain 引入 I/O、端口归属偏离）。
 
 ## 系统现状
 

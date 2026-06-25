@@ -1,8 +1,8 @@
 import { create } from "zustand";
-import type { DayDecisionHints, NavigationPlan } from "../../../../domains/trip-navigation/route-plan";
+import type { DayDecisionHints, NavigationPlan, TravelMode } from "../../../../domains/trip-navigation/route-plan";
 import type { TripPlan } from "../../../../domains/trip-planning/trip-plan";
 
-type SupportedTravelMode = "walk" | "transit" | "drive";
+type SupportedTravelMode = TravelMode;
 
 export type TripViewState = {
   tripPlan: TripPlan | null;

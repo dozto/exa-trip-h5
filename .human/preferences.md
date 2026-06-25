@@ -28,7 +28,7 @@
 
 ## 架构与分层约定
 
-- 遵循 DDD + 六边形架构（见 `.human/architecture.md`、`.human/ddd-principles.md`、`.human/hexagonal-principles.md`）。
+- 遵循 DDD + 六边形架构（见 `.human/architecture.md`）。
 - 页面、数据、逻辑分离：
   - 页面层仅负责渲染与触发 UI 事件；
   - Feature 层仅负责用例编排，不涉及领域事件，对 UI 与具体实现无感知；

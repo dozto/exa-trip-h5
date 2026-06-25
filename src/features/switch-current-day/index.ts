@@ -7,7 +7,7 @@ export const switchCurrentDay: SwitchCurrentDay = async (
 ): Promise<Result<SwitchCurrentDayOutput, AppError>> => {
   if (!input.dayId) {
     return err({
-      code: "trip_load_failed",
+      code: "day_switch_failed",
       message: "Day id is required"
     });
   }

@@ -25,16 +25,34 @@
 
 tiny-change MUST 产出“简化记录”（推荐路径：`.ai/rfcs/tiny-change-*.md`），但 MAY 跳过完整 RFC 章节与确认门。
 
+### 0.3 Definition of Ready（DoR·输入就绪判定）
+
+AI 在进入上下文加载（§1）前，MUST 先判断输入是否就绪。满足以下全部条件才算 Ready：
+
+1. **可识别变更意图**：输入包含“做什么”的明确描述（功能名或修改目标），不含歧义。
+2. **不与 Non-Goals 冲突**：意图不与 `.human/project.md` 的 Non-Goals 矛盾；若矛盾，AI MUST 先向用户指出冲突并请求澄清，不进入流程。
+3. **约束文件存在且可读**：`.human/project.md` 与 `.human/architecture.md` 非空且可解析。
+4. **统一语言就绪（如涉及新术语）**：若变更可能引入新业务概念，`.human/glossary.md` 应可被引用（AI 可在流程中补登记，但启动时需确认文件存在）。
+
+#### 未就绪时的处理
+
+- 缺条件 1 或 2 → AI 输出“冲突/歧义说明”并请求用户修正输入，不进入 §1。
+- 缺条件 3 或 4 → AI 输出“`.human/` 文件缺失”提示并请求用户补齐，不进入 §1。
+- 全部满足 → AI 进入 §1 上下文加载。
+
+#### fast vs strict 差异
+
+- `fast`：DoR 由 AI 自行快速判定，不向用户确认就绪状态，直接进入或中止。
+- `strict`：DoR 判定结果显式输出给用户，等待用户确认后再进入 §1。
+
 ## 1. 上下文加载（必须）
 
 AI MUST 先读取：
 
 1. `.human/project.md`（目标与边界）
-2. `.human/architecture.md`（总架构约束）
-3. `.human/ddd-principles.md`（DDD 原则）
-4. `.human/hexagonal-principles.md`（六边形原则）
-5. `.human/glossary.md`（统一语言）
-6. `.ai/index.md`、`.ai/current.md`（当前认知与现状）
+2. `.human/architecture.md`（架构、DDD 战术与六边形约束）
+3. `.human/glossary.md`（统一语言）
+4. `.ai/index.md`、`.ai/current.md`（当前认知与现状）
 
 AI MUST NOT 在未读取上述文件前直接产出实现方案。
 
@@ -158,4 +176,4 @@ AI 每次交付应包含：
 - 发现跨层依赖违规仍继续提交
 - 发现术语冲突但未更新 glossary
 
-> 本文件定义流程；原则定义见 `.human/ddd-principles.md` 与 `.human/hexagonal-principles.md`。
+> 本文件定义流程；原则定义见 `.human/architecture.md`。

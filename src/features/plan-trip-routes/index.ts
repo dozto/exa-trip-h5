@@ -8,6 +8,7 @@ import {
   type NavigationPlan,
   type TravelMode
 } from "../../domains/trip-navigation/route-plan";
+import { haversineDistanceKm } from "../../shared/geo";
 import { err, ok } from "../../shared/result";
 import type { PlanTripRoutes, PlanTripRoutesDependencies, PlanTripRoutesInput } from "./port";
 
@@ -15,33 +16,6 @@ const defaultModes: TravelMode[] = ["walk", "transit", "drive"];
 
 const buildCacheKey = (input: PlanTripRoutesInput, modes: TravelMode[]): string => {
   return `${input.tripPlan.tripId}:${input.dayId}:${modes.join("-")}:${input.departureTime ?? "now"}`;
-};
-
-const toRadians = (value: number) => (value * Math.PI) / 180;
-
-const estimateDistanceKm = (
-  from: { lat?: number; lng?: number },
-  to: { lat?: number; lng?: number }
-): number | undefined => {
-  if (
-    typeof from.lat !== "number" ||
-    typeof from.lng !== "number" ||
-    typeof to.lat !== "number" ||
-    typeof to.lng !== "number"
-  ) {
-    return undefined;
-  }
-
-  const earthRadiusKm = 6371;
-  const deltaLat = toRadians(to.lat - from.lat);
-  const deltaLng = toRadians(to.lng - from.lng);
-  const sinHalfLat = Math.sin(deltaLat / 2);
-  const sinHalfLng = Math.sin(deltaLng / 2);
-  const a =
-    sinHalfLat * sinHalfLat +
-    Math.cos(toRadians(from.lat)) * Math.cos(toRadians(to.lat)) * sinHalfLng * sinHalfLng;
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  return earthRadiusKm * c;
 };
 
 export const createPlanTripRoutes = (deps: PlanTripRoutesDependencies): PlanTripRoutes => {
@@ -75,7 +49,7 @@ export const createPlanTripRoutes = (deps: PlanTripRoutesDependencies): PlanTrip
 
         const options: RouteOption[] = [];
         const legModes = filterModesByContext(modes, {
-          distanceKm: estimateDistanceKm(from, to)
+          distanceKm: haversineDistanceKm(from, to)
         });
 
         for (const mode of legModes) {

@@ -5,7 +5,7 @@
 
 开工前按序阅读：
 
-1. [.human/](.human/) —— 约束（目标 / 架构规则 / 偏好 / 术语 / ADR）
+1. [.human/README.md](.human/README.md) —— 约束层入口（目标 / 架构规则 / 偏好 / 术语 / ADR）
 2. [.ai/index.md](.ai/index.md) —— 系统入口（领域 / 特性地图）
 3. [.ai/current.md](.ai/current.md) —— 当前状态
 4. [.ai/agent.md](.ai/agent.md) —— AI 工作规则与门控流程

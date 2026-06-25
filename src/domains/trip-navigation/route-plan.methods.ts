@@ -8,28 +8,7 @@ import type {
   TravelMode,
   EventEstimate
 } from "./route-plan";
-
-const parseTimeToMinutes = (time: string): number | null => {
-  const match = /^(\d{2}):(\d{2})$/.exec(time);
-  if (!match) {
-    return null;
-  }
-  const hours = Number(match[1]);
-  const minutes = Number(match[2]);
-  if (hours > 23 || minutes > 59) {
-    return null;
-  }
-  return hours * 60 + minutes;
-};
-
-const formatMinutesToTime = (minutesInDay: number): string => {
-  const clamped = Math.max(0, minutesInDay);
-  const hours = Math.floor(clamped / 60)
-    .toString()
-    .padStart(2, "0");
-  const minutes = (clamped % 60).toString().padStart(2, "0");
-  return `${hours}:${minutes}`;
-};
+import { formatMinutesToTime, parseTimeToMinutes } from "../../shared/time";
 
 const byDuration = (a: RouteOption, b: RouteOption): number => a.durationMinutes - b.durationMinutes;
 

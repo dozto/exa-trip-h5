@@ -16,9 +16,7 @@
 
 ## 关键约束入口（来自 `.human/`）
 
-- [`.human/architecture.md`](../.human/architecture.md) — 总体架构约束与依赖方向
-- [`.human/ddd-principles.md`](../.human/ddd-principles.md) — DDD 专项约束（统一语言、聚合、无领域事件策略、测试）
-- [`.human/hexagonal-principles.md`](../.human/hexagonal-principles.md) — 六边形专项约束（ports、inbound/outbound、组装根、边界转换）
+- [`.human/architecture.md`](../.human/architecture.md) — 架构约束与依赖方向、DDD 战术约束、六边形适配器约束、测试与验证
 
 ## 对话触发入口
 

@@ -16,7 +16,7 @@ describe("switchCurrentDay", () => {
 
     expect(result.ok).toBe(false);
     if (!result.ok) {
-      expect(result.error.code).toBe("trip_load_failed");
+      expect(result.error.code).toBe("day_switch_failed");
       expect(result.error.message).toContain("Day id is required");
     }
   });

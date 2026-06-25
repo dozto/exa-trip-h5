@@ -6,28 +6,13 @@ import {
 } from "../../domains/trip-navigation/route-plan";
 import { err, ok, type Result } from "../../shared/result";
 import type { AppError } from "../../shared/errors";
+import { parseTimeToMinutes } from "../../shared/time";
 import type {
   ShowDayDecisionHints,
   ShowDayDecisionHintsDependencies,
   ShowDayDecisionHintsInput,
   ShowDayDecisionHintsOutput
 } from "./port";
-
-const parseMinutes = (time?: string): number | null => {
-  if (!time) {
-    return null;
-  }
-  const match = /^(\d{2}):(\d{2})$/.exec(time);
-  if (!match) {
-    return null;
-  }
-  const hours = Number(match[1]);
-  const minutes = Number(match[2]);
-  if (hours > 23 || minutes > 59) {
-    return null;
-  }
-  return hours * 60 + minutes;
-};
 
 export const createShowDayDecisionHints = (
   deps: ShowDayDecisionHintsDependencies = {}
@@ -74,8 +59,8 @@ export const createShowDayDecisionHints = (
         const previous = activities[index];
         const currentEstimate = eventEstimates[index + 1];
         const availableMinutes = (() => {
-          const previousEnd = parseMinutes(previous?.endTime);
-          const currentStart = parseMinutes(activity.startTime);
+          const previousEnd = parseTimeToMinutes(previous?.endTime);
+          const currentStart = parseTimeToMinutes(activity.startTime);
           if (typeof previousEnd !== "number" || typeof currentStart !== "number") {
             return undefined;
           }

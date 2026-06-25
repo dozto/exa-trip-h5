@@ -1,5 +1,6 @@
 import type { AppError } from "../../shared/errors";
 import { err, ok, type Result } from "../../shared/result";
+import { assertPlanInvariants } from "../../domains/trip-planning/trip-plan";
 import type {
   LoadTripPlan,
   LoadTripPlanDependencies,
@@ -39,6 +40,18 @@ export const createLoadTripPlan = (deps: LoadTripPlanDependencies): LoadTripPlan
     }
 
     const tripPlan = validation.value;
+
+    const invariantViolations = assertPlanInvariants(tripPlan);
+    if (invariantViolations.length > 0) {
+      return err({
+        code: "trip_invalid_schema",
+        message: invariantViolations[0]?.message ?? "Plan invariant check failed",
+        details: {
+          violations: invariantViolations
+        }
+      });
+    }
+
     const defaultDay = tripPlan.days[0];
     if (!defaultDay) {
       return err({

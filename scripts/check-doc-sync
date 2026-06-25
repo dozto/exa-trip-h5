@@ -41,6 +41,14 @@ has_path_prefix() {
   printf '%s\n' "$CHANGED" | rg -q "^${prefix}"
 }
 
+has_business_logic_change() {
+  printf '%s\n' "$CHANGED" | rg -q '^src/(domains|features|inbound/web/state/command)/'
+}
+
+has_any_src_or_test_change() {
+  printf '%s\n' "$CHANGED" | rg -q '^(src|tests)/'
+}
+
 has_rfc_change() {
   printf '%s\n' "$CHANGED" | rg -q '^\.ai/rfcs/RFC-[0-9]{4}.*\.md$'
 }
@@ -53,10 +61,12 @@ has_current_change() {
   printf '%s\n' "$CHANGED" | rg -q '^\.ai/current\.md$'
 }
 
-if has_path_prefix 'src/' || has_path_prefix 'tests/'; then
-  if ! has_rfc_change && ! has_tiny_change_record; then
-    echo "[FAIL] src/tests changed but no RFC update or tiny-change record found in .ai/rfcs/."
-    EXIT_CODE=1
+if has_any_src_or_test_change; then
+  if has_business_logic_change; then
+    if ! has_rfc_change && ! has_tiny_change_record; then
+      echo "[FAIL] Business logic changed (src/domains/, src/features/, src/inbound/web/state/command/) but no RFC or tiny-change record found in .ai/rfcs/."
+      EXIT_CODE=1
+    fi
   fi
   if ! has_current_change; then
     echo "[FAIL] src/tests changed but .ai/current.md not updated."

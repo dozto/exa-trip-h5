@@ -1,3 +1,4 @@
+import type { TravelMode } from "../../../../domains/trip-navigation/route-plan";
 import type { TripUiCommand } from "./events";
 import { TRIP_UI_COMMANDS } from "./events";
 
@@ -14,7 +15,7 @@ export const tripCommands = {
     type: TRIP_UI_COMMANDS.mapPointSelected,
     dayId
   }),
-  travelModeSelected: (mode: "walk" | "transit" | "drive"): TripUiCommand => ({
+  travelModeSelected: (mode: TravelMode): TripUiCommand => ({
     type: TRIP_UI_COMMANDS.travelModeSelected,
     mode
   })

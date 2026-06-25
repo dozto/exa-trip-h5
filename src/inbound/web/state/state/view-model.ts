@@ -1,5 +1,5 @@
 import type { TripDay, TripPlan } from "../../../../domains/trip-planning/trip-plan";
-import type { DayDecisionHints, NavigationPlan } from "../../../../domains/trip-navigation/route-plan";
+import type { DayDecisionHints, NavigationPlan, TravelMode } from "../../../../domains/trip-navigation/route-plan";
 import { formatDateLabel, formatDuration } from "../../../../shared/time";
 import { selectActiveDayId, selectMapPoints } from "./selectors";
 
@@ -42,7 +42,7 @@ export type TripMapViewModel = {
   subtitle: string;
   points: TripMapPointViewModel[];
   routeCoordinates: [number, number][];
-  selectedTravelMode: "walk" | "transit" | "drive";
+  selectedTravelMode: TravelMode;
   routeSummary: {
     durationMinutes: number;
     distanceKm: number;
@@ -145,7 +145,7 @@ export const buildTripMapModel = (
   currentDayId: string | null,
   navigationPlan: NavigationPlan | null,
   dayDecisionHints: DayDecisionHints | null,
-  selectedTravelMode: "walk" | "transit" | "drive"
+  selectedTravelMode: TravelMode
 ): TripMapViewModel => {
   const points = selectMapPoints(tripPlan, currentDayId);
   const routeCoordinates: [number, number][] = [];

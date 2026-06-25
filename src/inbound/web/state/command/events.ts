@@ -1,3 +1,5 @@
+import type { TravelMode } from "../../../../domains/trip-navigation/route-plan";
+
 export const TRIP_UI_COMMANDS = {
   pageOpened: "page-opened",
   daySelected: "day-selected",
@@ -20,7 +22,7 @@ export type TripUiCommand =
     }
   | {
       type: (typeof TRIP_UI_COMMANDS)["travelModeSelected"];
-      mode: "walk" | "transit" | "drive";
+      mode: TravelMode;
     };
 
 export type TripUiCommandType = TripUiCommand["type"];

@@ -6,6 +6,7 @@ import {
   buildTripMapModel,
   buildTripTipsModel
 } from "./view-model";
+import type { TravelMode } from "../../../../domains/trip-navigation/route-plan";
 import { tripCommands } from "../command/commands";
 import { useTripModelRuntime } from "../store/runtime-context";
 import { selectCurrentDay } from "./selectors";
@@ -58,7 +59,7 @@ export const useItineraryPageModel = () => {
   }, [commandBus]);
 
   const onSelectTravelMode = useCallback(
-    (mode: "walk" | "transit" | "drive") => {
+    (mode: TravelMode) => {
       commandBus.emit(tripCommands.travelModeSelected(mode));
     },
     [commandBus]
